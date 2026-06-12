@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Oumayma Fazzeni | Portfolio IA</title>
+  <meta name="description" content="Portfolio d'Oumayma Fazzeni — Étudiante en ingénierie IA (ESPRIT). Projets Deep Learning, Medical AI, NLP & RAG." />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="#home">Oumayma<span>.</span></a>
+
+      <nav class="nav">
+        <a href="#about">À propos</a>
+        <a href="#projects">Projets</a>
+        <a href="#skills">Compétences</a>
+        <a href="#achievements">Distinctions</a>
+        <a href="#contact" class="btn small">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <main id="home">
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="hero-text">
+          <p class="badge">Étudiante ingénierie IA • ESPRIT</p>
+          <h1>Je construis des systèmes IA <span class="accent">performants</span> et <span class="accent">explicables</span>.</h1>
+          <p class="subtitle">
+            Deep Learning & Medical AI (anomaly detection), NLP/LLMs & RAG, Computer Vision.
+            Je cherche un stage en Intelligence Artificielle.
+          </p>
+
+          <div class="cta">
+            <a class="btn" href="#projects">Voir mes projets</a>
+            <a class="btn ghost" href="CV Oumayma_Fazzeni.pdf" target="_blank" rel="noreferrer">Télécharger mon CV</a>
+          </div>
+
+          <div class="links">
+            <a href="https://www.linkedin.com/in/oumayma-fazzeni-03088027b target=" rel="noreferrer">LinkedIn</a>
+            <span>•</span>
+            <a href="https://github.com/oumayma-fazzeni" target="_blank" rel="noreferrer">GitHub</a>
+            <span>•</span>
+            <a href="mailto:oumayma.fazzeni@esprit.tn">oumayma.fazzeni@esprit.tn</a>
+          </div>
+        </div>
+
+        <div class="hero-card">
+          <div class="mini-card">
+            <h3>Focus</h3>
+            <ul>
+              <li>Medical AI</li>
+              <li>Anomaly Detection</li>
+              <li>Computer Vision</li>
+              <li>NLP / RAG</li>
+              <li>AGENTIC SOLUTIONS</li>
+            </ul>
+          </div>
+
+          <div class="mini-card">
+            <h3>Highlights</h3>
+            <ul>
+               <li>AICSET’25 (auteure)</li>
+              <li>Hackathon top 8</li>
+              <li>ESPRIT Bridge 3ème place</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- About -->
+    <section id="about" class="section">
+      <div class="container">
+        <div class="section-head">
+          <h2>À propos</h2>
+          <p>Un résumé clair, orienté impact.</p>
+        </div>
+
+        <div class="about-grid">
+          <div class="card">
+            <h3>Profil</h3>
+            <p>
+              Étudiante en ingénierie Intelligence Artificielle à ESPRIT, je conçois des solutions IA
+               et systèmes intelligents, avec un fort intérêt pour l’explicabilité
+               et l’optimisation de performance.
+            </p>
+          </div>
+
+          <div class="card">
+            <h3>Ce que je recherche</h3>
+            <p>
+              Stage IA (2–3 mois) : Deep Learning, Computer Vision, NLP/RAG, ou agentic AI.
+              
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section id="research" class="section">
+  <section id="research" class="section">
+  <div class="container">
+    <div class="section-head">
+      <h2>projet en cours</h2>
+      <p>Exploration de systèmes d’IA de nouvelle génération.</p>
+    </div>
+
+    <div class="card">
+      <h3>Système d’IA Agentique pour la Chimie  : formulation </h3>
+      <p>
+        Je travaille actuellement sur le développement d’un système d’intelligence artificielle 
+        agentique capable d’assister l’analyse scientifique en chimie . 
+        Ce système vise à combiner le raisonnement basé sur les LLM, 
+        l’intégration de bases de données scientifiques structurées, 
+        ainsi que la planification autonome de tâches afin de soutenir les workflows de recherche.
+      </p>
+
+      <ul class="bullets">
+        <li>Architecture multi-agents avec raisonnement collaboratif</li>
+        <li>Intégration de bases de données scientifiques (données chimiques )</li>
+        <li>Génération automatique des formules et analyse assistée</li>
+        <li>Exploration de LLM augmentés par des outils externes (tool-augmented LLMs)</li>
+      </ul>
+
+      <p><i>Statut : Phase de recherche et d’expérimentation</i></p>
+    </div>
+  </div>
+</section>
+</section>
+    <!-- Projects -->
+    <section id="projects" class="section alt">
+      <div class="container">
+        <div class="section-head">
+          <h2>Projets</h2>
+          <p>Une sélection de projets académiques et R&D (avec métriques et responsabilités).</p>
+        </div>
+
+        <div class="grid projects-grid">
+
+          <!-- Project 1 -->
+          <article class="project card">
+            <div class="project-top">
+              <h3>Détection & localisation de tumeurs cérébrales (IRM)</h3>
+              <p class="tag">Deep Learning • One-Class • Explainable AI</p>
+            </div>
+            <p>
+              Pipeline one-class pour détecter et localiser les tumeurs : <b>ResNet18 + Mahalanobis</b> et
+              <b>U-Net Autoencoder</b>, avec heatmaps explicatives (L1 + SSIM).
+            </p>
+            <ul class="bullets">
+              <li><b>ROC-AUC ≈ 0.986</b> • <b>PR-AUC ≈ 0.985</b></li>
+              <li>Prétraitement, entraînement, validation, interprétabilité (heatmaps)</li>
+              <li>Livrables : modèle, scripts, rapport + résultats</li>
+            </ul>
+            
+          </article>
+
+          <!-- Project 2 -->
+          <article class="project card">
+            <div class="project-top">
+              <h3>Détection de nodules pulmonaires (Scanner)</h3>
+              <p class="tag">Computer Vision • Segmentation • Classification</p>
+            </div>
+            <p>
+              Détection automatique de nodules sur CT thoracique : pipeline de préparation des données,
+              modèle de classification + segmentation .
+            </p>
+            <ul class="bullets">
+              <li>Étapes : preprocessing, augmentation, entraînement, évaluation (F1/Recall/Precision)</li>
+              <li>Objectif : aide au diagnostic précoce et réduction d’erreurs</li>
+              
+            </ul>
+            <div class="project-links">
+              <a href="https://www.linkedin.com/posts/oumayma-fazzeni-03088027b_were-proud-to-share-our-ai-project-focused-activity-7414044363007336448-5vjy?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAAERLWCQBhmayEbqrqSSaSYNnPypMaMElnfs" target="_blank" rel="noreferrer">Présentation et demo</a>
+              
+            </div>
+           
+          </article>
+
+          
+
+          <!-- Project 4 -->
+          <article class="project card">
+            <div class="project-top">
+              <h3>Children of the Moon — Plateforme IA pour patients XP</h3>
+              <p class="tag">Multimodal • NLP • CV • Recommandation</p>
+            </div>
+            <p>
+              Plateforme web intelligente : chatbot médical, analyse d’images dermatologiques, navigation
+              UV, analyse émotionnelle via dessins, prescriptions automatisées.
+            </p>
+            <ul class="bullets">
+              <li>Modules : DermaBot, DermaDetect/Seg, DermaMap, DermaDraw, DermaPrescribe</li>
+              <li>Approche : intégration multi-modules + orientation impact social</li>
+            </ul>
+            <div class="project-links">
+              <a href="https://www.linkedin.com/posts/oumayma-fazzeni-03088027b_ai-healthcare-xp-activity-7330516617287581696-opvZ?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAAERLWCQBhmayEbqrqSSaSYNnPypMaMElnfs" target="_blank" rel="noreferrer">Présentation et demo</a>
+              
+            </div>
+          </article>
+
+          <!-- Project 5 -->
+          <article class="project card">
+            <div class="project-top">
+              <h3>Hackathon — AI Serving Kasserine’s Heritage (Top 8)</h3>
+              <p class="tag">Speech • Vision • Multilingue</p>
+            </div>
+            <p>
+              Site web intelligent pour valoriser le patrimoine : traduction, support langue des signes,
+              classification des monuments, chatbot avec Speech-to-Text et Text-to-Speech.
+            </p>
+            <ul class="bullets">
+              <li>Travail sous pression, livraison rapide, collaboration équipe</li>
+              <li>Intégration multimodale (audio, image, texte)</li>
+            </ul>
+            <div class="project-links">
+              <a href="https://www.linkedin.com/posts/oumayma-fazzeni-03088027b_hackathon-h12innovation-esprit-activity-7293074021582028800-38tl?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAAERLWCQBhmayEbqrqSSaSYNnPypMaMElnfs" target="_blank" rel="noreferrer">Présentation</a>
+              
+            </div>
+          </article>
+
+          <!-- Project 6 -->
+          <article class="project card">
+            <div class="project-top">
+              <h3>ESPRIT Bridge — Plateforme Alumni (3ème place)</h3>
+              <p class="tag">AI Resume • Chatbot • Recommandation</p>
+            </div>
+            <p>
+              Plateforme pour networking alumni : fil d’actualité intelligent, mentorat, fundraising,
+              AI Resume Analysis et chatbot d’orientation carrière.
+            </p>
+            <ul class="bullets">
+              <li>Conception produit + intégration de modules IA</li>
+              <li>Focus : utilité, UX et impact</li>
+            </ul>
+            <div class="project-links">
+              <a href="https://www.linkedin.com/posts/mohamed-iyed-lagha-5a984a282_espritbridge-alumnixhack-hackathonproject-ugcPost-7300960844828332032-RTUb?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAAERLWCQBhmayEbqrqSSaSYNnPypMaMElnfs" target="_blank" rel="noreferrer">Présentation et démo</a>
+              
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Skills -->
+    <section id="skills" class="section">
+      <div class="container">
+        <div class="section-head">
+          <h2>Compétences</h2>
+          
+        </div>
+
+        <div class="grid skills-grid">
+          <div class="card">
+            <h3>IA</h3>
+            <div class="chips">
+              <span>Deep Learning</span><span>Computer Vision</span><span>NLP</span><span>LLMs</span>
+              <span>RAG</span><span>Agentique</span><span>Explainability</span>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Tech</h3>
+            <div class="chips">
+              <span>Python</span><span>PyTorch</span><span>TensorFlow</span><span>SQL</span>
+              <span>Django</span><span>C++</span>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Déploiement</h3>
+            <div class="chips">
+              <span>API</span><span>Web Integration</span><span>Evaluation</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Achievements -->
+    <section id="achievements" class="section alt">
+      <div class="container">
+        <div class="section-head">
+          <h2>Distinctions & Recherche</h2>
+          
+        </div>
+
+        <div class="grid two">
+          <div class="card">
+            <h3>AICSET’25 (Auteure)</h3>
+            <p>
+              Présentation de l’article : <i>“An Intelligent RAG-Based System for Personalized Musculoskeletal Injury Rehabilitation and Decision Support”.</i>
+            </p>
+          </div>
+          <div class="card">
+            <h3>Hackathons</h3>
+            <ul class="bullets">
+              <li>AI Serving Kasserine’s Heritage — <b>Top 8</b></li>
+              <li>ESPRIT Bridge — <b>3ème place</b></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section id="contact" class="section">
+      <div class="container">
+        <div class="section-head">
+          <h2>Contact</h2>
+          
+        </div>
+
+        <div class="card contact-card">
+          <p><b>Email:</b> <a href="mailto:oumayma.fazzeni@esprit.tn">oumayma.fazzeni@esprit.tn</a></p>
+          <p><b>Téléphone:</b> +216 54 605 103</p>
+          
+          <div class="cta">
+            <a class="btn" href="mailto:oumayma.fazzeni@esprit.tn?subject=Stage%20IA%20-%20Candidature">M’écrire</a>
+            
+          </div>
+        </div>
+
+        <footer class="footer">
+          <p>© <span id="year"></span> Oumayma Fazzeni • Portfolio IA</p>
+        </footer>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
