@@ -18,4 +18,15 @@ export default defineConfig({
   server: {
     port: 8080,
   },
+  ssr: {
+    noExternal: ['@tanstack/react-start'],
+  },
+  build: {
+    rollupOptions: {
+      input: {
+        client: 'src/start.ts',
+        server: 'src/server.ts',
+      },
+    },
+  },
 })
