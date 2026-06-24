@@ -10,15 +10,15 @@ export const profile = {
     line2: "one project at a time.",
   },
   intro:
-    "My journey through the cosmos of AI, data and sustainability. Welcome to my little universe — feel free to explore!",
+    "My journey through the cosmos of AI, data and sustainability. Welcome to my little universe , feel free to explore!",
   about:
     "Hi! I believe that I thrive when tackling hands-on projects and exploring innovative approaches to sustainability. I am eager to contribute my creativity, technical skills, and enthusiasm to collaborative projects, while challenging myself to grow beyond my current limits.",
   contact: {
-    email: "adyasrv.72@gmail.com",
-    linkedin: "https://www.linkedin.com",
-    instagram: "https://www.instagram.com",
-    github: "https://github.com",
-    phone: "+216 00 000 000",
+    email: "Jebali.Maram@esprit.tn",
+    linkedin: "https://www.linkedin.com/in/jebali-maram-2182b62a7/",
+    instagram: "https://www.instagram.com/maram__jebali/",
+    github: "https://github.com/MaramJebali",
+    phone: "+216 56 568 707",
   },
 };
 
