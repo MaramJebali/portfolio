@@ -38,7 +38,15 @@ import {
 } from "react-icons/si";
 import { profile, certifications } from "@/data/portfolio";
 import profileImage from "@/assets/profile.jpg";
+import certif1 from "@/assets/certificates/certif1.png";
+import certif2 from "@/assets/certificates/certif2.png";
+import certif3 from "@/assets/certificates/certif3.png";
+import certif4 from "@/assets/certificates/certif4.png";
+import certif5 from "@/assets/certificates/certif5.png";
+import certif6 from "@/assets/certificates/certif6.png";
 import ButtonCV from "@/components/ui/Button-cv";
+
+const certificationImages = [certif1, certif2, certif3, certif4, certif5, certif6];
 
 /* ---------- skill → logo mapping ---------- */
 type IconType = ComponentType<{
@@ -301,7 +309,9 @@ function CertificationCard({
     setIsHovered(false);
   }
 
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     setIsExpanded(true);
   };
 
@@ -309,24 +319,25 @@ function CertificationCard({
     setIsExpanded(false);
   };
 
-  // Use .png format to match your images
-  const imagePath = `/src/assets/certificates/certif${index + 1}.png`;
+  // Get image from imported certificates array
+  const imagePath = certificationImages[index] || certificationImages[0];
 
   return (
     <>
       {/* Card - Double size */}
-      <div className="[perspective:1200px] flex-shrink-0 w-[380px]">
+      <div 
+        className="[perspective:1200px] flex-shrink-0 w-[380px] cursor-pointer"
+        onClick={handleClick}
+      >
         <motion.div
           ref={ref}
           onMouseMove={onMove}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={onLeave}
-          onClick={handleClick}
           style={{ 
             rotateX: rx, 
             rotateY: ry, 
             transformStyle: "preserve-3d",
-            cursor: 'pointer',
           }}
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
@@ -375,70 +386,62 @@ function CertificationCard({
 
       {/* Expanded Modal - Using Portal to render outside the scrolling container */}
       {isExpanded && createPortal(
-        <AnimatePresence>
+        <div 
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-xl p-4"
+          onClick={handleClose}
+        >
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-xl p-4"
-            onClick={handleClose}
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: "spring", damping: 20 }}
+            className="relative max-w-4xl w-full rounded-2xl border border-white/10 bg-black/90 p-6 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
           >
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.8, opacity: 0 }}
-              transition={{ type: "spring", damping: 20 }}
-              className="relative max-w-4xl w-full rounded-2xl border border-white/10 bg-black/90 p-4 shadow-2xl"
-              onClick={(e) => e.stopPropagation()}
+            {/* Close button */}
+            <button
+              onClick={handleClose}
+              className="absolute -top-3 -right-3 z-10 rounded-full bg-black/80 border border-white/20 p-2 text-white/60 hover:text-white transition-colors duration-300"
+              aria-label="Close modal"
             >
-              {/* Close button */}
-              <button
-                onClick={handleClose}
-                className="absolute -top-3 -right-3 z-10 rounded-full bg-black/80 border border-white/20 p-2 text-white/60 hover:text-white transition-colors duration-300"
-              >
-                <X className="h-5 w-5" />
-              </button>
+              <X className="h-5 w-5" />
+            </button>
 
-              {/* Expanded Image */}
-              <div className="relative overflow-hidden rounded-xl">
-                <img
-                  src={imagePath}
-                  alt={cert.title}
-                  className="w-full h-auto max-h-[80vh] object-contain"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = '/placeholder-cert.png';
-                  }}
-                />
+            {/* Expanded Image */}
+            <div className="relative overflow-hidden rounded-xl mb-4">
+              <img
+                src={imagePath}
+                alt={cert.title}
+                className="w-full h-auto max-h-[70vh] object-contain"
+              />
+            </div>
+
+            {/* Certification Info */}
+            <div className="space-y-4">
+              <h3 className="text-xl font-display text-white/90">
+                {cert.title}
+              </h3>
+              <div className="flex flex-wrap items-center gap-4 text-sm">
+                <span className="flex items-center gap-2 font-mono text-[0.7rem] uppercase tracking-[0.15em] text-white/70">
+                  <BadgeCheck className="h-4 w-4 text-violet-glow flex-shrink-0" />
+                  {cert.issuer}
+                </span>
+                <span className="text-white/20">·</span>
+                <span className="font-mono text-[0.7rem] text-white/60">
+                  {cert.issued}
+                </span>
+                <span className="text-white/20">·</span>
+                <span className="font-mono text-[0.65rem] text-white/50">
+                  ID: {cert.credentialId}
+                </span>
               </div>
+            </div>
 
-              {/* Certification Info overlay */}
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6 pt-12">
-                <h3 className="text-lg font-display text-white/90">
-                  {cert.title}
-                </h3>
-                <div className="mt-1 flex flex-wrap items-center gap-3">
-                  <span className="flex items-center gap-1.5 font-mono text-[0.6rem] uppercase tracking-[0.15em] text-white/60">
-                    <BadgeCheck className="h-3.5 w-3.5 text-violet-glow" />
-                    {cert.issuer}
-                  </span>
-                  <span className="text-white/20">·</span>
-                  <span className="font-mono text-[0.6rem] text-white/40">
-                    {cert.issued}
-                  </span>
-                  <span className="text-white/20">·</span>
-                  <span className="font-mono text-[0.5rem] text-white/30">
-                    ID: {cert.credentialId}
-                  </span>
-                </div>
-              </div>
-
-              {/* Close hint */}
-              <p className="mt-3 text-center font-mono text-[0.55rem] uppercase tracking-[0.2em] text-white/30">
-                Click outside to close
-              </p>
-            </motion.div>
+            {/* Close hint */}
+            <p className="mt-6 text-center font-mono text-[0.6rem] uppercase tracking-[0.2em] text-white/40">
+              Click outside to close
+            </p>
           </motion.div>
-        </AnimatePresence>,
+        </div>,
         document.body
       )}
     </>

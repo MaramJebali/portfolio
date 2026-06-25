@@ -15,7 +15,7 @@ const ROTATING_WORDS = ["Project", "Step", "Idea"];
 
 // Find the longest word for fixed width
 const LONGEST_WORD = ROTATING_WORDS.reduce((a, b) => a.length > b.length ? a : b, "");
-const WORD_WIDTH = LONGEST_WORD.length * 0.9 + 1.5;
+const WORD_WIDTH = LONGEST_WORD.length * 0.9 + 8;
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -126,7 +126,7 @@ function Index() {
             className="relative inline-block overflow-hidden align-middle text-center"
             style={{ 
               width: `${WORD_WIDTH}rem`,
-              height: '2 em'
+              height: '1.5em'
             }}
           >
             <motion.span
