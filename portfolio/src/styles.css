@@ -168,3 +168,87 @@
     transform: translateY(-10px);
   }
 }
+
+/* ===== About section interactive utilities ===== */
+@keyframes marquee-x {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.animate-marquee {
+  animation: marquee-x var(--marquee-duration, 38s) linear infinite;
+}
+.marquee-track:hover .animate-marquee {
+  animation-play-state: paused;
+}
+.marquee-mask {
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 9%,
+    black 91%,
+    transparent
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 9%,
+    black 91%,
+    transparent
+  );
+}
+
+@keyframes card-shine {
+  0% {
+    transform: translateX(-130%) skewX(-18deg);
+  }
+  100% {
+    transform: translateX(230%) skewX(-18deg);
+  }
+}
+.cert-card:hover .cert-shine {
+  animation: card-shine 0.95s ease-out;
+}
+
+@keyframes border-flow {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+
+/* --- SHINING TEXT --- */
+.shining-text {
+  background: linear-gradient(
+    90deg,
+    rgba(180, 160, 255, 0.3),
+    rgba(255, 255, 255, 1),
+    rgba(200, 180, 255, 0.8),
+    rgba(255, 255, 255, 1),
+    rgba(180, 160, 255, 0.3)
+  );
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shineText 4s ease-in-out infinite;
+}
+
+@keyframes shineText {
+  0% {
+    background-position: -300% 50%;
+  }
+  50% {
+    background-position: 300% 50%;
+  }
+  100% {
+    background-position: -300% 50%;
+  }
+}

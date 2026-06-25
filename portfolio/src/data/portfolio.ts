@@ -69,6 +69,7 @@ export type Certification = {
   issuer: string;
   issued: string;
   credentialId: string;
+  image?: string; // 👈 Added optional image field
 };
 
 export const certifications: Certification[] = [
@@ -77,42 +78,49 @@ export const certifications: Certification[] = [
     issuer: "NVIDIA",
     issued: "Mar 2026",
     credentialId: "pF329a7-SwSyOeTLS-WONQ",
+    image: "/src/assets/certificates/certif1.png", // 👈 certif1.png
   },
   {
     title: "Applications of AI for Anomaly Detection",
     issuer: "NVIDIA",
     issued: "Jan 2026",
     credentialId: "tsySqX7jSfWy5q22OMI6hw",
+    image: "/src/assets/certificates/certif2.png", // 👈 certif2.png
   },
   {
     title: "Building AI Agents with Multimodal Models",
     issuer: "NVIDIA",
     issued: "Nov 2025",
     credentialId: "F2g-DA5JToWxYr22V1Y7Tg",
+    image: "/src/assets/certificates/certif3.png", // 👈 certif3.png
   },
   {
     title: "Applications of AI for Predictive Maintenance",
     issuer: "NVIDIA",
     issued: "Oct 2025",
     credentialId: "38XtOjStR1qLXwTBdn0PuA",
+    image: "/src/assets/certificates/certif4.png", // 👈 certif4.png
   },
   {
     title: "Attendance — Hashgraph Developer",
     issuer: "The Hashgraph Association",
     issued: "Sep 2025",
     credentialId: "15e18aba-8b9a-4baf-b26e-bd887dbc790e",
+    image: "/src/assets/certificates/certif5.png", // 👈 certif5.png
   },
   {
     title: "Generative AI with Diffusion Models",
     issuer: "NVIDIA",
     issued: "Feb 2025",
     credentialId: "TauXuWfURMOBYNutOVkopw",
+    image: "/src/assets/certificates/certif6.png", // 👈 certif6.png
   },
   {
     title: "Fundamentals of Deep Learning",
     issuer: "NVIDIA",
     issued: "Jan 2024",
     credentialId: "1tO0Ys3ITkGJkXM3sgBKrQ",
+    image: "/src/assets/certificates/certif7.png", // 👈 certif7.png
   },
 ];
 

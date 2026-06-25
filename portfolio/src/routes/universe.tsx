@@ -43,7 +43,7 @@ function Universe() {
   return (
     <div className="relative min-h-screen overflow-hidden bg-background">
       <div className="pointer-events-none fixed inset-0">
-        <StarField count={70} />
+        <StarField />
         <div className="absolute inset-x-0 bottom-0 h-[55vh] bg-spotlight opacity-60" />
         <div className="absolute -left-40 top-1/4 h-96 w-96 rounded-full bg-accent/10 blur-[120px]" />
         <div className="absolute -right-40 top-1/2 h-96 w-96 rounded-full bg-primary/10 blur-[120px]" />
