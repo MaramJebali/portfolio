@@ -126,7 +126,7 @@ function Index() {
             className="relative inline-block overflow-hidden align-middle text-center"
             style={{ 
               width: `${WORD_WIDTH}rem`,
-              height: '4 em'
+              height: '2 em'
             }}
           >
             <motion.span
