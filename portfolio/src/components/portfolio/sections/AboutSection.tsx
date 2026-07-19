@@ -1,13 +1,13 @@
 import { useRef, useState, type ComponentType } from "react";
-import { createPortal } from "react-dom";
 import {
   motion,
   useMotionTemplate,
   useMotionValue,
   useSpring,
-  AnimatePresence,
 } from "motion/react";
-import { Award, BadgeCheck, Sparkles, X } from "lucide-react";
+import { Award, Sparkles } from "lucide-react";
+import { CertificationModal } from "@/components/portfolio/CertificationModal";
+import { StarField as RawStarField } from "@/components/portfolio/StarField";
 import {
   SiPython,
   SiJavascript,
@@ -38,15 +38,20 @@ import {
 } from "react-icons/si";
 import { profile, certifications } from "@/data/portfolio";
 import profileImage from "@/assets/profile.jpg";
-import certif1 from "@/assets/certificates/certif1.png";
-import certif2 from "@/assets/certificates/certif2.png";
-import certif3 from "@/assets/certificates/certif3.png";
-import certif4 from "@/assets/certificates/certif4.png";
-import certif5 from "@/assets/certificates/certif5.png";
-import certif6 from "@/assets/certificates/certif6.png";
+import certif1 from "@/assets/certificates/certif6.png";
+import certif2 from "@/assets/certificates/certif5.png";
+import certif3 from "@/assets/certificates/certif4.png";
+import certif4 from "@/assets/certificates/certif3.png";
+import certif5 from "@/assets/certificates/certif2.png";
+import certif6 from "@/assets/certificates/certif1.png";
 import ButtonCV from "@/components/ui/Button-cv";
 
 const certificationImages = [certif1, certif2, certif3, certif4, certif5, certif6];
+
+type StarFieldProps = { count: number };
+const StarField = RawStarField as unknown as ComponentType<StarFieldProps>;
+/** Softer than the hero's starfield (1) so it sits behind content without competing for attention. */
+const ABOUT_STARFIELD_OPACITY = 0.35;
 
 /* ---------- skill → logo mapping ---------- */
 type IconType = ComponentType<{
@@ -278,14 +283,15 @@ function ProfileCard() {
 /* ---------- CERTIFICATION CARD (Larger, No Text) ---------- */
 function CertificationCard({ 
   cert, 
-  index 
+  index,
+  onOpen,
 }: { 
   cert: typeof certifications[0];
   index: number;
+  onOpen: (index: number) => void;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
   const rx = useSpring(useMotionValue(0), { stiffness: 150, damping: 18 });
   const ry = useSpring(useMotionValue(0), { stiffness: 150, damping: 18 });
   const gx = useMotionValue(50);
@@ -309,14 +315,10 @@ function CertificationCard({
     setIsHovered(false);
   }
 
-  const handleClick = (e: React.MouseEvent) => {
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsExpanded(true);
-  };
-
-  const handleClose = () => {
-    setIsExpanded(false);
+    onOpen(index);
   };
 
   // Get image from imported certificates array
@@ -325,9 +327,12 @@ function CertificationCard({
   return (
     <>
       {/* Card - Double size */}
-      <div 
-        className="[perspective:1200px] flex-shrink-0 w-[380px] cursor-pointer"
+      <motion.button
+        type="button"
+        className="[perspective:1200px] flex-shrink-0 w-[380px] cursor-pointer text-left"
         onClick={handleClick}
+        whileHover={{ scale: 1.03 }}
+        whileTap={{ scale: 0.97 }}
       >
         <motion.div
           ref={ref}
@@ -339,8 +344,6 @@ function CertificationCard({
             rotateY: ry, 
             transformStyle: "preserve-3d",
           }}
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.97 }}
           className="group relative w-full rounded-2xl border border-border/30 bg-black/80 p-3 backdrop-blur transition-all duration-300 hover:border-primary/40 hover:shadow-[0_0_40px_rgba(120,100,255,0.15)]"
         >
           {/* Glow following cursor */}
@@ -382,68 +385,7 @@ function CertificationCard({
             </span>
           </div>
         </motion.div>
-      </div>
-
-      {/* Expanded Modal - Using Portal to render outside the scrolling container */}
-      {isExpanded && createPortal(
-        <div 
-          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-xl p-4"
-          onClick={handleClose}
-        >
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: "spring", damping: 20 }}
-            className="relative max-w-4xl w-full rounded-2xl border border-white/10 bg-black/90 p-6 shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Close button */}
-            <button
-              onClick={handleClose}
-              className="absolute -top-3 -right-3 z-10 rounded-full bg-black/80 border border-white/20 p-2 text-white/60 hover:text-white transition-colors duration-300"
-              aria-label="Close modal"
-            >
-              <X className="h-5 w-5" />
-            </button>
-
-            {/* Expanded Image */}
-            <div className="relative overflow-hidden rounded-xl mb-4">
-              <img
-                src={imagePath}
-                alt={cert.title}
-                className="w-full h-auto max-h-[70vh] object-contain"
-              />
-            </div>
-
-            {/* Certification Info */}
-            <div className="space-y-4">
-              <h3 className="text-xl font-display text-white/90">
-                {cert.title}
-              </h3>
-              <div className="flex flex-wrap items-center gap-4 text-sm">
-                <span className="flex items-center gap-2 font-mono text-[0.7rem] uppercase tracking-[0.15em] text-white/70">
-                  <BadgeCheck className="h-4 w-4 text-violet-glow flex-shrink-0" />
-                  {cert.issuer}
-                </span>
-                <span className="text-white/20">·</span>
-                <span className="font-mono text-[0.7rem] text-white/60">
-                  {cert.issued}
-                </span>
-                <span className="text-white/20">·</span>
-                <span className="font-mono text-[0.65rem] text-white/50">
-                  ID: {cert.credentialId}
-                </span>
-              </div>
-            </div>
-
-            {/* Close hint */}
-            <p className="mt-6 text-center font-mono text-[0.6rem] uppercase tracking-[0.2em] text-white/40">
-              Click outside to close
-            </p>
-          </motion.div>
-        </div>,
-        document.body
-      )}
+      </motion.button>
     </>
   );
 }
@@ -451,10 +393,12 @@ function CertificationCard({
 /* ---------- CERTIFICATION ROW (Scrolling like skills) ---------- */
 function CertificationRow({ 
   certifications, 
-  duration = 40 
+  duration = 40,
+  onSelect,
 }: { 
   certifications: any[];
   duration?: number;
+  onSelect: (index: number) => void;
 }) {
   const doubled = [...certifications, ...certifications];
   
@@ -492,6 +436,7 @@ function CertificationRow({
               key={`${cert.credentialId}-${i}`} 
               cert={cert} 
               index={i % certifications.length}
+              onOpen={onSelect}
             />
           ))}
         </div>
@@ -503,6 +448,7 @@ function CertificationRow({
 /* ---------- MAIN ABOUT SECTION ---------- */
 export function AboutSection() {
   const [status, setStatus] = useState<'idle' | 'downloading' | 'done'>('idle');
+  const [selectedCertIndex, setSelectedCertIndex] = useState<number | null>(null);
 
   const handleDownload = async () => {
     if (status === 'downloading') return;
@@ -524,7 +470,18 @@ export function AboutSection() {
   };
 
   return (
-    <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-24">
+    <div className="relative">
+      {/* Soft cosmic background — same StarField as the hero, dialed down so it doesn't fight the content */}
+      <motion.div
+        className="fixed inset-0 z-0"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: ABOUT_STARFIELD_OPACITY }}
+        transition={{ duration: 1.8, ease: "easeOut" }}
+      >
+        <StarField count={40} />
+      </motion.div>
+
+      <div className="relative z-10 mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-24">
       {/* Intro */}
       <div className="grid items-center gap-10 lg:grid-cols-[1fr_0.85fr]">
         <div>
@@ -617,18 +574,7 @@ export function AboutSection() {
           What I work <span className="italic text-white/60">with</span>
         </h3>
         
-        <motion.p
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="mt-3 font-mono text-[0.65rem] uppercase tracking-[0.2em] text-white/50 select-none"
-          style={{
-            textShadow: '0 0 10px rgba(255,255,255,0.1), 0 0 20px rgba(255,255,255,0.05)',
-          }}
-        >
-          Each category scrolls independently — hover to pause
-        </motion.p>
+        
 
         <div className="relative mt-8 flex flex-col gap-6">
           {skillCategories.map((category, index) => (
@@ -653,25 +599,24 @@ export function AboutSection() {
           <span className="italic text-white/60">& credentials</span>
         </h3>
         
-        <motion.p
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="mt-3 font-mono text-[0.65rem] uppercase tracking-[0.2em] text-white/50 select-none"
-          style={{
-            textShadow: '0 0 10px rgba(255,255,255,0.1), 0 0 20px rgba(255,255,255,0.05)',
-          }}
-        >
-          Click any card to expand — hover to pause
-        </motion.p>
+        
 
         <div className="relative mt-8">
           <CertificationRow 
             certifications={certifications} 
             duration={45}
+            onSelect={setSelectedCertIndex}
           />
         </div>
+      </div>
+
+      <CertificationModal
+        certifications={certifications}
+        images={certificationImages}
+        currentIndex={selectedCertIndex}
+        onClose={() => setSelectedCertIndex(null)}
+        onNavigate={setSelectedCertIndex}
+      />
       </div>
     </div>
   );
