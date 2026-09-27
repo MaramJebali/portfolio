@@ -1,11 +1,13 @@
-import { useRef, useState, type ComponentType } from "react";
+import { useLayoutEffect, useRef, useState, type ComponentType } from "react";
 import {
   motion,
   useMotionTemplate,
   useMotionValue,
   useSpring,
 } from "motion/react";
-import { Award, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { CertificationModal } from "@/components/portfolio/CertificationModal";
 import { StarField as RawStarField } from "@/components/portfolio/StarField";
 import {
@@ -45,12 +47,24 @@ import certif4 from "@/assets/certificates/certif3.png";
 import certif5 from "@/assets/certificates/certif2.png";
 import certif6 from "@/assets/certificates/certif1.png";
 import ButtonCV from "@/components/ui/Button-cv";
+import { HeroManifesto } from "@/components/ui/HeroManifesto";
+import { SectionEyebrow } from "@/components/ui/SectionEyebrow";
 
-const certificationImages = [certif1, certif2, certif3, certif4, certif5, certif6];
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
+
+const certificationImages = [
+  certif1,
+  certif2,
+  certif3,
+  certif4,
+  certif5,
+  certif6,
+];
 
 type StarFieldProps = { count: number };
 const StarField = RawStarField as unknown as ComponentType<StarFieldProps>;
-/** Softer than the hero's starfield (1) so it sits behind content without competing for attention. */
 const ABOUT_STARFIELD_OPACITY = 0.35;
 
 /* ---------- skill → logo mapping ---------- */
@@ -100,15 +114,32 @@ const skillIcons: Record<string, { Icon: IconType; color: string }> = {
 const skillCategories = [
   {
     title: "Languages",
-    items: ["Python", "JavaScript", "TypeScript", "SQL", "C","C++", "Java"],
+    items: ["Python", "JavaScript", "TypeScript", "SQL", "C", "C++", "Java"],
   },
   {
     title: "AI / Machine Learning",
-    items: ["PyTorch", "TensorFlow", "scikit-learn", "Transformers", "OpenCV", "YOLOv8"],
+    items: [
+      "PyTorch",
+      "TensorFlow",
+      "scikit-learn",
+      "Transformers",
+      "OpenCV",
+      "YOLOv8",
+    ],
   },
   {
     title: "LLMs & Agents",
-    items: ["LangChain", "LangGraph", "LangSmith", "RAG / GraphRAG", "FAISS", "Groq", "NVIDIA NIM", "Ollama", "Mistral"],
+    items: [
+      "LangChain",
+      "LangGraph",
+      "LangSmith",
+      "RAG / GraphRAG",
+      "FAISS",
+      "Groq",
+      "NVIDIA NIM",
+      "Ollama",
+      "Mistral",
+    ],
   },
   {
     title: "Data & BI",
@@ -124,14 +155,15 @@ function SkillChip({ name }: { name: string }) {
   const entry = skillIcons[name];
   const Icon = entry?.Icon;
   const [isHovered, setIsHovered] = useState(false);
-  
+
   return (
-    <div 
+    <div
       className="group/chip flex shrink-0 items-center gap-2.5 rounded-xl border border-border/30 bg-black/80 px-4 py-2.5 backdrop-blur transition-all duration-300 hover:border-primary/50"
       style={{
         borderColor: isHovered && entry?.color ? entry.color : undefined,
-        boxShadow: isHovered && entry?.color ? `0 0 20px ${entry.color}33` : undefined,
-        backgroundColor: isHovered ? 'rgba(0,0,0,0.9)' : 'rgba(0,0,0,0.8)',
+        boxShadow:
+          isHovered && entry?.color ? `0 0 20px ${entry.color}33` : undefined,
+        backgroundColor: isHovered ? "rgba(0,0,0,0.9)" : "rgba(0,0,0,0.8)",
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -139,18 +171,21 @@ function SkillChip({ name }: { name: string }) {
       {Icon ? (
         <Icon
           className="h-5 w-5 shrink-0 transition-all duration-300 group-hover/chip:scale-110"
-          style={{ 
-            color: isHovered ? entry.color : entry.color,
-            filter: isHovered ? `drop-shadow(0 0 8px ${entry.color}66)` : undefined,
+          style={{
+            color: entry.color,
+            filter: isHovered
+              ? `drop-shadow(0 0 8px ${entry.color}66)`
+              : undefined,
           }}
         />
       ) : (
         <Sparkles className="h-5 w-5 shrink-0 text-violet-glow" />
       )}
-      <span 
+      <span
         className="whitespace-nowrap text-sm font-medium transition-colors duration-300"
         style={{
-          color: isHovered && entry?.color ? entry.color : 'rgba(255,255,255,0.85)',
+          color:
+            isHovered && entry?.color ? entry.color : "rgba(255,255,255,0.85)",
           opacity: isHovered ? 1 : 0.85,
         }}
       >
@@ -160,33 +195,35 @@ function SkillChip({ name }: { name: string }) {
   );
 }
 
-function SkillCategoryRow({ 
-  category, 
-  duration, 
-  reverse = false 
-}: { 
+function SkillCategoryRow({
+  category,
+  duration,
+  reverse = false,
+}: {
   category: { title: string; items: string[] };
   duration: number;
   reverse?: boolean;
 }) {
   const doubled = [...category.items, ...category.items];
-  
+
   return (
-    <div className="space-y-2">
+    <div className="space-y-2" data-skill-row>
       <div className="flex items-center gap-2 px-1">
-        <h4 
+        <h4
           className="font-mono text-xs uppercase tracking-[0.2em] text-white select-none"
           style={{
-            textShadow: '0 0 10px rgba(255,255,255,0.3), 0 0 20px rgba(255,255,255,0.1)',
+            textShadow:
+              "0 0 10px rgba(255,255,255,0.3), 0 0 20px rgba(255,255,255,0.1)",
           }}
         >
           {category.title}
         </h4>
         <span className="flex-1 border-t border-white/10" />
-        <span 
+        <span
           className="font-mono text-[0.6rem] text-white/40"
           style={{
-            textShadow: '0 0 10px rgba(255,255,255,0.2), 0 0 20px rgba(255,255,255,0.05)',
+            textShadow:
+              "0 0 10px rgba(255,255,255,0.2), 0 0 20px rgba(255,255,255,0.05)",
           }}
         >
           {category.items.length}
@@ -260,7 +297,7 @@ function ProfileCard() {
             className="absolute left-3 top-3 flex items-center gap-2 rounded-md border border-white/10 bg-background/60 px-2 py-1 font-mono text-[0.55rem] uppercase tracking-[0.2em] text-white/60 backdrop-blur"
             style={{ transform: "translateZ(40px)" }}
           >
-            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white/40" />
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-magic-mint/70" />
             About
           </div>
           <div
@@ -280,13 +317,13 @@ function ProfileCard() {
   );
 }
 
-/* ---------- CERTIFICATION CARD (Larger, No Text) ---------- */
-function CertificationCard({ 
-  cert, 
+/* ---------- CERTIFICATION CARD ---------- */
+function CertificationCard({
+  cert,
   index,
   onOpen,
-}: { 
-  cert: typeof certifications[0];
+}: {
+  cert: (typeof certifications)[0];
   index: number;
   onOpen: (index: number) => void;
 }) {
@@ -321,103 +358,89 @@ function CertificationCard({
     onOpen(index);
   };
 
-  // Get image from imported certificates array
   const imagePath = certificationImages[index] || certificationImages[0];
 
   return (
-    <>
-      {/* Card - Double size */}
-      <motion.button
-        type="button"
-        className="[perspective:1200px] flex-shrink-0 w-[380px] cursor-pointer text-left"
-        onClick={handleClick}
-        whileHover={{ scale: 1.03 }}
-        whileTap={{ scale: 0.97 }}
+    <motion.button
+      type="button"
+      className="[perspective:1200px] flex-shrink-0 w-[380px] cursor-pointer text-left"
+      onClick={handleClick}
+      whileHover={{ scale: 1.03 }}
+      whileTap={{ scale: 0.97 }}
+    >
+      <motion.div
+        ref={ref}
+        onMouseMove={onMove}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={onLeave}
+        style={{ rotateX: rx, rotateY: ry, transformStyle: "preserve-3d" }}
+        className="group relative w-full rounded-2xl border border-border/30 bg-black/80 p-3 backdrop-blur transition-all duration-300 hover:border-primary/40 hover:shadow-[0_0_40px_rgba(120,100,255,0.15)]"
       >
         <motion.div
-          ref={ref}
-          onMouseMove={onMove}
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={onLeave}
-          style={{ 
-            rotateX: rx, 
-            rotateY: ry, 
-            transformStyle: "preserve-3d",
-          }}
-          className="group relative w-full rounded-2xl border border-border/30 bg-black/80 p-3 backdrop-blur transition-all duration-300 hover:border-primary/40 hover:shadow-[0_0_40px_rgba(120,100,255,0.15)]"
-        >
-          {/* Glow following cursor */}
-          <motion.div
-            aria-hidden
-            style={{ background: glow }}
-            className="pointer-events-none absolute inset-0 z-10 rounded-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-          />
-          
-          {/* Image Container - Larger */}
-          <div className="relative overflow-hidden rounded-xl aspect-[4/3]">
-            <img
-              src={imagePath}
-              alt={cert.title}
-              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
-              draggable={false}
-              onError={(e) => {
-                // Fallback if image doesn't exist
-                (e.target as HTMLImageElement).src = '/placeholder-cert.png';
-              }}
-            />
-            {/* Gradient veil */}
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-            
-            {/* Corner brackets */}
-            <span className="pointer-events-none absolute left-2 top-2 h-5 w-5 border-l-2 border-t-2 border-white/20" />
-            <span className="pointer-events-none absolute right-2 top-2 h-5 w-5 border-r-2 border-t-2 border-white/20" />
-            <span className="pointer-events-none absolute bottom-2 left-2 h-5 w-5 border-b-2 border-l-2 border-white/20" />
-            <span className="pointer-events-none absolute bottom-2 right-2 h-5 w-5 border-b-2 border-r-2 border-white/20" />
-          </div>
+          aria-hidden
+          style={{ background: glow }}
+          className="pointer-events-none absolute inset-0 z-10 rounded-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        />
 
-          {/* Hover indicator - only visible on hover */}
-          <div 
-            className="absolute bottom-4 right-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-            style={{ transform: "translateZ(30px)" }}
-          >
-            <span className="text-[0.5rem] font-mono uppercase tracking-[0.1em] text-white/40 bg-black/50 px-2 py-1 rounded backdrop-blur">
-              Click to expand ✦
-            </span>
-          </div>
-        </motion.div>
-      </motion.button>
-    </>
+        <div className="relative overflow-hidden rounded-xl aspect-[4/3]">
+          <img
+            src={imagePath}
+            alt={cert.title}
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+            draggable={false}
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = "/placeholder-cert.png";
+            }}
+          />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+          <span className="pointer-events-none absolute left-2 top-2 h-5 w-5 border-l-2 border-t-2 border-white/20" />
+          <span className="pointer-events-none absolute right-2 top-2 h-5 w-5 border-r-2 border-t-2 border-white/20" />
+          <span className="pointer-events-none absolute bottom-2 left-2 h-5 w-5 border-b-2 border-l-2 border-white/20" />
+          <span className="pointer-events-none absolute bottom-2 right-2 h-5 w-5 border-b-2 border-r-2 border-white/20" />
+        </div>
+
+        <div
+          className="absolute bottom-4 right-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+          style={{ transform: "translateZ(30px)" }}
+        >
+          <span className="text-[0.5rem] font-mono uppercase tracking-[0.1em] text-white/40 bg-black/50 px-2 py-1 rounded backdrop-blur">
+            Click to expand ✦
+          </span>
+        </div>
+      </motion.div>
+    </motion.button>
   );
 }
 
-/* ---------- CERTIFICATION ROW (Scrolling like skills) ---------- */
-function CertificationRow({ 
-  certifications, 
+function CertificationRow({
+  certifications,
   duration = 40,
   onSelect,
-}: { 
+}: {
   certifications: any[];
   duration?: number;
   onSelect: (index: number) => void;
 }) {
   const doubled = [...certifications, ...certifications];
-  
+
   return (
-    <div className="space-y-2">
+    <div className="space-y-2" data-cert-row>
       <div className="flex items-center gap-2 px-1">
-        <h4 
+        <h4
           className="font-mono text-xs uppercase tracking-[0.2em] text-white select-none"
           style={{
-            textShadow: '0 0 10px rgba(255,255,255,0.3), 0 0 20px rgba(255,255,255,0.1)',
+            textShadow:
+              "0 0 10px rgba(255,255,255,0.3), 0 0 20px rgba(255,255,255,0.1)",
           }}
         >
           Credentials
         </h4>
         <span className="flex-1 border-t border-white/10" />
-        <span 
+        <span
           className="font-mono text-[0.6rem] text-white/40"
           style={{
-            textShadow: '0 0 10px rgba(255,255,255,0.2), 0 0 20px rgba(255,255,255,0.05)',
+            textShadow:
+              "0 0 10px rgba(255,255,255,0.2), 0 0 20px rgba(255,255,255,0.05)",
           }}
         >
           {certifications.length}
@@ -432,9 +455,9 @@ function CertificationRow({
           }}
         >
           {doubled.map((cert, i) => (
-            <CertificationCard 
-              key={`${cert.credentialId}-${i}`} 
-              cert={cert} 
+            <CertificationCard
+              key={`${cert.credentialId}-${i}`}
+              cert={cert}
               index={i % certifications.length}
               onOpen={onSelect}
             />
@@ -447,31 +470,175 @@ function CertificationRow({
 
 /* ---------- MAIN ABOUT SECTION ---------- */
 export function AboutSection() {
-  const [status, setStatus] = useState<'idle' | 'downloading' | 'done'>('idle');
-  const [selectedCertIndex, setSelectedCertIndex] = useState<number | null>(null);
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const cardWrapRef = useRef<HTMLDivElement>(null);
+  const dividerRef = useRef<HTMLDivElement>(null);
+  const rightColRef = useRef<HTMLDivElement>(null);
+
+  const [status, setStatus] = useState<"idle" | "downloading" | "done">("idle");
+  const [selectedCertIndex, setSelectedCertIndex] = useState<number | null>(
+    null,
+  );
 
   const handleDownload = async () => {
-    if (status === 'downloading') return;
-    setStatus('downloading');
+    if (status === "downloading") return;
+    setStatus("downloading");
     try {
       await new Promise((resolve) => setTimeout(resolve, 1500));
-      const link = document.createElement('a');
-      link.href = '/cv.pdf';
-      link.download = 'Maram_CV.pdf';
+      const link = document.createElement("a");
+      link.href = "/cv.pdf";
+      link.download = "Maram_CV.pdf";
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      setStatus('done');
-      setTimeout(() => setStatus('idle'), 2500);
+      setStatus("done");
+      setTimeout(() => setStatus("idle"), 2500);
     } catch (error) {
-      console.error('Download failed:', error);
-      setStatus('idle');
+      console.error("Download failed:", error);
+      setStatus("idle");
     }
   };
 
+  /* ---------- GSAP scroll choreography ---------- */
+  useLayoutEffect(() => {
+    const root = sectionRef.current;
+    if (!root) return;
+
+    const prefersReduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    if (prefersReduced) return;
+
+    const ctx = gsap.context(() => {
+      if (dividerRef.current) {
+        gsap.fromTo(
+          dividerRef.current,
+          { scaleX: 0, transformOrigin: "center center", opacity: 0 },
+          {
+            scaleX: 1,
+            opacity: 1,
+            duration: 1,
+            ease: "power3.inOut",
+            scrollTrigger: {
+              trigger: dividerRef.current,
+              start: "top 88%",
+              once: true,
+            },
+          },
+        );
+      }
+
+      if (cardWrapRef.current) {
+        gsap.fromTo(
+          cardWrapRef.current,
+          { y: 60, opacity: 0, rotateX: 8, transformPerspective: 1000 },
+          {
+            y: 0,
+            opacity: 1,
+            rotateX: 0,
+            duration: 1.1,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: cardWrapRef.current,
+              start: "top 85%",
+              once: true,
+            },
+          },
+        );
+
+        gsap.to(cardWrapRef.current, {
+          y: -50,
+          ease: "none",
+          scrollTrigger: {
+            trigger: root,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: 0.6,
+          },
+        });
+      }
+
+      if (rightColRef.current) {
+        const items = rightColRef.current.querySelectorAll("[data-cascade]");
+        gsap.fromTo(
+          items,
+          { y: 24, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.7,
+            stagger: 0.08,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: rightColRef.current,
+              start: "top 82%",
+              once: true,
+            },
+          },
+        );
+      }
+
+      const skillRows = root.querySelectorAll("[data-skill-row]");
+      if (skillRows.length) {
+        gsap.fromTo(
+          skillRows,
+          { y: 32, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.8,
+            stagger: 0.09,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: skillRows[0] as Element,
+              start: "top 85%",
+              once: true,
+            },
+          },
+        );
+      }
+
+      const certRow = root.querySelector("[data-cert-row]");
+      if (certRow) {
+        gsap.fromTo(
+          certRow,
+          { y: 32, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.9,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: certRow,
+              start: "top 85%",
+              once: true,
+            },
+          },
+        );
+      }
+
+      const headings = root.querySelectorAll("[data-heading]");
+      headings.forEach((h) => {
+        gsap.fromTo(
+          h,
+          { y: 20, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.8,
+            ease: "power3.out",
+            scrollTrigger: { trigger: h, start: "top 88%", once: true },
+          },
+        );
+      });
+    }, root);
+
+    return () => ctx.revert();
+  }, []);
+
   return (
-    <div className="relative">
-      {/* Soft cosmic background — same StarField as the hero, dialed down so it doesn't fight the content */}
+    <div ref={sectionRef} className="relative">
+      {/* Cosmic background */}
       <motion.div
         className="fixed inset-0 z-0"
         initial={{ opacity: 0 }}
@@ -481,142 +648,142 @@ export function AboutSection() {
         <StarField count={40} />
       </motion.div>
 
-      <div className="relative z-10 mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-24">
-      {/* Intro */}
-      <div className="grid items-center gap-10 lg:grid-cols-[1fr_0.85fr]">
-        <div>
-          <motion.h2 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="font-display text-4xl text-white sm:text-5xl select-none"
-            style={{
-              textShadow: '0 0 20px rgba(255,255,255,0.15), 0 0 40px rgba(255,255,255,0.05)',
-            }}
-          >
-            More about{" "}
-            <span className="italic text-white/60">myself</span>
-          </motion.h2>
-          
-          <motion.p 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="mt-7 text-base leading-relaxed text-white/80 select-none"
-            style={{
-              textShadow: '0 0 10px rgba(255,255,255,0.1), 0 0 20px rgba(255,255,255,0.05)',
-            }}
-          >
-            {profile.about}
-          </motion.p>
-          
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="mt-8"
-          >
-            <ButtonCV 
-              text="Get Resume"
-              isLoading={status === 'downloading'}
-              status={status}
-              onClick={handleDownload}
-            />
-          </motion.div>
+      <div className="relative z-10 mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-28">
+        {/* Animated rule only — no "01 — About" text */}
+        <SectionEyebrow className="mb-12" />
 
-          <motion.div 
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="mt-8 flex flex-wrap gap-3 font-mono text-[0.7rem] uppercase tracking-[0.15em]"
-          >
-            <span 
-              className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-white/80 backdrop-blur"
-              style={{
-                textShadow: '0 0 10px rgba(255,255,255,0.1)',
-              }}
-            >
-              {profile.role}
-            </span>
-            <span 
-              className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-white/80 backdrop-blur"
-              style={{
-                textShadow: '0 0 10px rgba(255,255,255,0.1)',
-              }}
-            >
-              {profile.school}
-            </span>
-            <span 
-              className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-white/80 backdrop-blur"
-              style={{
-                textShadow: '0 0 10px rgba(255,255,255,0.1)',
-              }}
-            >
-              {profile.location}
-            </span>
-          </motion.div>
-        </div>
-
-        <ProfileCard />
-      </div>
-
-      {/* Skills - Categorized Scrolling Rows */}
-      <div className="mt-20">
-        <h3 className="font-display text-3xl text-white sm:text-4xl select-none"
-          style={{
-            textShadow: '0 0 20px rgba(255,255,255,0.1), 0 0 40px rgba(255,255,255,0.05)',
-          }}
-        >
-          What I work <span className="italic text-white/60">with</span>
-        </h3>
-        
-        
-
-        <div className="relative mt-8 flex flex-col gap-6">
-          {skillCategories.map((category, index) => (
-            <SkillCategoryRow
-              key={category.title}
-              category={category}
-              duration={28 + index * 4}
-              reverse={index % 2 === 1}
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* Certifications - New Design with Larger Cards */}
-      <div className="mt-20">
-        <h3 className="font-display text-3xl text-white sm:text-4xl select-none"
-          style={{
-            textShadow: '0 0 20px rgba(255,255,255,0.1), 0 0 40px rgba(255,255,255,0.05)',
-          }}
-        >
-          Certifications{" "}
-          <span className="italic text-white/60">& credentials</span>
-        </h3>
-        
-        
-
-        <div className="relative mt-8">
-          <CertificationRow 
-            certifications={certifications} 
-            duration={45}
-            onSelect={setSelectedCertIndex}
+        {/* Full-width manifesto — centered */}
+        <div className="mb-14 flex w-full justify-center">
+          <HeroManifesto
+            name={profile.name}
+            role={profile.role}
+            location={profile.location}
+            tagline="Building full-stack AI solutions."
+            introImages={[profileImage]}
           />
         </div>
-      </div>
 
-      <CertificationModal
-        certifications={certifications}
-        images={certificationImages}
-        currentIndex={selectedCertIndex}
-        onClose={() => setSelectedCertIndex(null)}
-        onNavigate={setSelectedCertIndex}
-      />
+        {/* Divider */}
+        <div
+          ref={dividerRef}
+          className="mb-16 h-px w-full bg-gradient-to-r from-transparent via-white/15 to-transparent"
+        />
+
+        {/* Two-column editorial block */}
+        <div className="grid items-start gap-12 lg:grid-cols-[0.8fr_1fr] lg:gap-16">
+          {/* Profile card */}
+          <div ref={cardWrapRef}>
+            <ProfileCard />
+          </div>
+
+          {/* Bio + CTA + chips */}
+          <div ref={rightColRef}>
+            <h2
+              data-cascade
+              data-heading
+              className="font-display text-4xl text-white sm:text-5xl select-none"
+              style={{
+                textShadow:
+                  "0 0 20px rgba(255,255,255,0.15), 0 0 40px rgba(255,255,255,0.05)",
+              }}
+            >
+              More about <span className="italic text-white/60">myself</span>
+            </h2>
+
+            <p
+              data-cascade
+              className="mt-7 text-[0.95rem] leading-[1.85] text-magic-parchment/75 select-none"
+              style={{
+                textShadow: "0 0 12px rgba(255,255,255,0.06)",
+              }}
+            >
+              {profile.about}
+            </p>
+
+            <div data-cascade className="mt-9">
+              <ButtonCV
+                text="Get Resume"
+                isLoading={status === "downloading"}
+                status={status}
+                onClick={handleDownload}
+              />
+            </div>
+
+            <div
+              data-cascade
+              className="mt-10 flex flex-col gap-3 font-mono text-[0.72rem] uppercase tracking-[0.2em]"
+            >
+              <div className="flex items-center gap-3 text-magic-parchment/65">
+                <span className="h-1.5 w-1.5 rounded-full bg-magic-mint shadow-[0_0_10px_var(--magic-mint)]" />
+                {profile.role}
+              </div>
+              <div className="flex items-center gap-3 text-magic-parchment/65">
+                <span className="h-1.5 w-1.5 rounded-full bg-magic-gold shadow-[0_0_10px_var(--magic-gold)]" />
+                {profile.school}
+              </div>
+              <div className="flex items-center gap-3 text-magic-parchment/65">
+                <span className="h-1.5 w-1.5 rounded-full bg-magic-rose shadow-[0_0_10px_var(--magic-rose)]" />
+                {profile.location}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Skills */}
+        <div className="mt-24">
+          <h3
+            data-heading
+            className="font-display text-3xl text-white sm:text-4xl select-none"
+            style={{
+              textShadow:
+                "0 0 20px rgba(255,255,255,0.1), 0 0 40px rgba(255,255,255,0.05)",
+            }}
+          >
+            What I work <span className="italic text-white/60">with</span>
+          </h3>
+
+          <div className="relative mt-10 flex flex-col gap-6">
+            {skillCategories.map((category, index) => (
+              <SkillCategoryRow
+                key={category.title}
+                category={category}
+                duration={28 + index * 4}
+                reverse={index % 2 === 1}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Certifications */}
+        <div className="mt-24">
+          <h3
+            data-heading
+            className="font-display text-3xl text-white sm:text-4xl select-none"
+            style={{
+              textShadow:
+                "0 0 20px rgba(255,255,255,0.1), 0 0 40px rgba(255,255,255,0.05)",
+            }}
+          >
+            Certifications{" "}
+            <span className="italic text-white/60">& credentials</span>
+          </h3>
+
+          <div className="relative mt-10">
+            <CertificationRow
+              certifications={certifications}
+              duration={45}
+              onSelect={setSelectedCertIndex}
+            />
+          </div>
+        </div>
+
+        <CertificationModal
+          certifications={certifications}
+          images={certificationImages}
+          currentIndex={selectedCertIndex}
+          onClose={() => setSelectedCertIndex(null)}
+          onNavigate={setSelectedCertIndex}
+        />
       </div>
     </div>
   );

@@ -4,20 +4,6 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/*
- * Design system definition.
- *
- * The @theme inline block maps CSS custom properties to Tailwind utility
- * classes (e.g. --color-primary -> bg-primary, text-primary).
- *
- * The :root and .dark blocks define the actual color values using oklch.
- * All colors MUST use oklch format.
- *
- * To add a new semantic color:
- * 1. Add the variable to :root (light value) and .dark (dark value)
- * 2. Register it in @theme inline as --color-<name>: var(--<name>)
- */
-
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -50,6 +36,13 @@
   --color-ring: var(--ring);
   --color-ring-offset-background: var(--background);
   --color-violet-glow: var(--violet-glow);
+
+  /* Magic palette — enchanted manuscript accents */
+  --color-magic-mint: var(--magic-mint);
+  --color-magic-gold: var(--magic-gold);
+  --color-magic-rose: var(--magic-rose);
+  --color-magic-parchment: var(--magic-parchment);
+
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
@@ -89,6 +82,13 @@
   --input: oklch(0.4 0.04 290 / 28%);
   --ring: oklch(0.64 0.2 292);
   --violet-glow: oklch(0.7 0.22 300);
+
+  /* Magic palette */
+  --magic-mint: oklch(0.86 0.1 168);
+  --magic-gold: oklch(0.82 0.08 73);
+  --magic-rose: oklch(0.78 0.07 348);
+  --magic-parchment: oklch(0.95 0.012 80);
+
   --chart-1: oklch(0.64 0.2 292);
   --chart-2: oklch(0.56 0.18 272);
   --chart-3: oklch(0.7 0.16 320);
@@ -149,6 +149,65 @@
   }
 }
 
+/* ==========================================================================
+   LENIS SMOOTH SCROLL
+   ========================================================================== */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   MAGIC TEXT — the enchanted gradient
+   ========================================================================== */
+.magic-text {
+  background: linear-gradient(
+    90deg,
+    var(--magic-mint) 0%,
+    var(--magic-gold) 32%,
+    var(--magic-rose) 66%,
+    var(--magic-mint) 100%
+  );
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: magic-shift 8s ease-in-out infinite;
+}
+
+@keyframes magic-shift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .magic-text {
+    animation: none;
+    background-position: 25% 50%;
+  }
+}
+
+/* ==========================================================================
+   ORIGINAL ANIMATIONS
+   ========================================================================== */
+
 @keyframes twinkle {
   0%,
   100% {
@@ -169,7 +228,6 @@
   }
 }
 
-/* ===== About section interactive utilities ===== */
 @keyframes marquee-x {
   from {
     transform: translateX(0);
@@ -223,8 +281,7 @@
   }
 }
 
-
-/* --- SHINING TEXT --- */
+/* --- SHINING TEXT (kept for backward compat) --- */
 .shining-text {
   background: linear-gradient(
     90deg,
