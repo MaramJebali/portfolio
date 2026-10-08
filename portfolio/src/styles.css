@@ -308,4 +308,27 @@ html.lenis body {
   100% {
     background-position: -300% 50%;
   }
+  
+}
+
+
+/* ==========================================================================
+   POLAROID PORTRAIT
+   ========================================================================== */
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+.animate-spin-slow {
+  animation: spin-slow 22s linear infinite;
+  transform-origin: center;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-spin-slow {
+    animation: none;
+  }
 }

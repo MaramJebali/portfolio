@@ -1,15 +1,38 @@
-import { useLayoutEffect, useRef, useState, type ComponentType } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type ComponentType,
+  type CSSProperties,
+} from "react";
 import {
   motion,
   useMotionTemplate,
   useMotionValue,
   useSpring,
 } from "motion/react";
-import { Sparkles } from "lucide-react";
+import {
+  ArrowUpRight,
+  BarChart3,
+  Briefcase,
+  ChevronDown,
+  Database,
+  GraduationCap,
+  MapPin,
+  Network,
+  Plug,
+  Search,
+  Sparkles,
+  Workflow,
+  Zap,
+} from "lucide-react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { CertificationModal } from "@/components/portfolio/CertificationModal";
-import { StarField as RawStarField } from "@/components/portfolio/StarField";
+import { StarField } from "@/components/portfolio/StarField";
+import ButtonCV from "@/components/ui/Button-cv";
+import type { SectionKey } from "@/components/portfolio/Navbar";
 import {
   SiPython,
   SiJavascript,
@@ -17,7 +40,6 @@ import {
   SiC,
   SiCplusplus,
   SiOpenjdk,
-  SiMysql,
   SiPytorch,
   SiTensorflow,
   SiScikitlearn,
@@ -34,11 +56,9 @@ import {
   SiStreamlit,
   SiGit,
   SiUnity,
-  SiGraphql,
-  SiPlotly,
   SiMistralai,
 } from "react-icons/si";
-import { profile, certifications } from "@/data/portfolio";
+import { profile, certifications, experiences } from "@/data/portfolio";
 import profileImage from "@/assets/profile.jpg";
 import certif1 from "@/assets/certificates/certif6.png";
 import certif2 from "@/assets/certificates/certif5.png";
@@ -46,13 +66,14 @@ import certif3 from "@/assets/certificates/certif4.png";
 import certif4 from "@/assets/certificates/certif3.png";
 import certif5 from "@/assets/certificates/certif2.png";
 import certif6 from "@/assets/certificates/certif1.png";
-import ButtonCV from "@/components/ui/Button-cv";
 import { HeroManifesto } from "@/components/ui/HeroManifesto";
-import { SectionEyebrow } from "@/components/ui/SectionEyebrow";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
+
+/* ---------- FLAGS ---------- */
+const SHOW_HERO = false;
 
 const certificationImages = [
   certif1,
@@ -63,54 +84,80 @@ const certificationImages = [
   certif6,
 ];
 
-type StarFieldProps = { count: number };
-const StarField = RawStarField as unknown as ComponentType<StarFieldProps>;
 const ABOUT_STARFIELD_OPACITY = 0.35;
 
-/* ---------- skill → logo mapping ---------- */
+type Certification = (typeof certifications)[number];
+type Experience = (typeof experiences)[number];
+
 type IconType = ComponentType<{
   className?: string;
-  style?: React.CSSProperties;
+  style?: CSSProperties;
 }>;
 
+/* ---------- SHARED GLASS TOKENS ---------- */
+const GLASS_TINT =
+  "linear-gradient(115deg, rgba(245,208,254,0.18) 0%, rgba(255,255,255,0.06) 30%, rgba(219,234,254,0.22) 62%, rgba(167,139,250,0.22) 100%)";
+
+/* Skill chips: cool monochrome blue only */
+const CHIP_TINT =
+  "linear-gradient(115deg, rgba(96,165,250,0.28) 0%, rgba(255,255,255,0.05) 40%, rgba(147,197,253,0.26) 70%, rgba(59,130,246,0.32) 100%)";
+
+const GLASS_BASE_CARD =
+  "linear-gradient(180deg, rgba(12,6,40,0.62) 0%, rgba(24,12,66,0.52) 100%)";
+const GLASS_BASE_DEEP =
+  "linear-gradient(180deg, rgba(12,6,40,0.88) 0%, rgba(24,12,66,0.80) 100%)";
+const GLASS_BORDER = "rgba(255,255,255,0.18)";
+
+const SOFT_BLUE = "rgba(219,234,254,0.8)";
+const SOFT_LAVENDER = "rgba(192,132,252,0.9)";
+const ACCENT_TEXT = "rgba(219,234,254,0.72)";
+
+/* NVIDIA brand green — used only on cert cards */
+const NVIDIA_GREEN = "#76B900";
+
+const FOCUS_RING =
+  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#c084fc]";
+
+const SECTION_GAP = "mt-24 sm:mt-32";
+
+/* ---------- SKILL ICONS ---------- */
 const skillIcons: Record<string, { Icon: IconType; color: string }> = {
-  Python: { Icon: SiPython, color: "#3776AB" },
+  Python: { Icon: SiPython, color: "#4B8BBE" },
   JavaScript: { Icon: SiJavascript, color: "#F7DF1E" },
-  TypeScript: { Icon: SiTypescript, color: "#3178C6" },
-  SQL: { Icon: SiMysql, color: "#4479A1" },
+  TypeScript: { Icon: SiTypescript, color: "#4B9BE8" },
+  SQL: { Icon: Database, color: "#7DB3E0" },
   C: { Icon: SiC, color: "#A8B9CC" },
-  Cplusplus: { Icon: SiCplusplus, color: "#a9bed6" },
+  "C++": { Icon: SiCplusplus, color: "#8FB4E3" },
   Java: { Icon: SiOpenjdk, color: "#F89820" },
   PyTorch: { Icon: SiPytorch, color: "#EE4C2C" },
-  TensorFlow: { Icon: SiTensorflow, color: "#FF6F00" },
+  TensorFlow: { Icon: SiTensorflow, color: "#FF8F1F" },
   "scikit-learn": { Icon: SiScikitlearn, color: "#F7931E" },
   Transformers: { Icon: SiHuggingface, color: "#FFD21E" },
-  OpenCV: { Icon: SiOpencv, color: "#5C3EE8" },
+  OpenCV: { Icon: SiOpencv, color: "#7C66F0" },
   YOLOv8: { Icon: SiPytorch, color: "#EE4C2C" },
-  LangChain: { Icon: SiLangchain, color: "#1C3C3C" },
-  LangGraph: { Icon: SiLanggraph, color: "#2F6B5E" },
-  LangSmith: { Icon: SiLangchain, color: "#5A4FCF" },
-  "RAG / GraphRAG": { Icon: SiGraphql, color: "#E10098" },
-  FAISS: { Icon: SiNvidia, color: "#76B900" },
-  Groq: { Icon: SiNvidia, color: "#F55036" },
+  LangChain: { Icon: SiLangchain, color: "#4CC3A5" },
+  LangGraph: { Icon: SiLanggraph, color: "#4CC3A5" },
+  LangSmith: { Icon: SiLangchain, color: "#8E84F0" },
+  "RAG / GraphRAG": { Icon: Network, color: "#F472B6" },
+  FAISS: { Icon: Search, color: "#A3E635" },
+  Groq: { Icon: Zap, color: "#F55036" },
   "NVIDIA NIM": { Icon: SiNvidia, color: "#76B900" },
   Ollama: { Icon: SiOllama, color: "#FFFFFF" },
   Mistral: { Icon: SiMistralai, color: "#FF7000" },
-  "Power BI": { Icon: SiPlotly, color: "#F2C811" },
-  SSIS: { Icon: SiMysql, color: "#4479A1" },
-  SSMS: { Icon: SiMysql, color: "#4479A1" },
-  Pandas: { Icon: SiPandas, color: "#150458" },
-  NumPy: { Icon: SiNumpy, color: "#4D77CF" },
-  Matplotlib: { Icon: SiPlotly, color: "#11557C" },
+  "Power BI": { Icon: BarChart3, color: "#F2C811" },
+  SSIS: { Icon: Workflow, color: "#7DB3E0" },
+  SSMS: { Icon: Database, color: "#7DB3E0" },
+  Pandas: { Icon: SiPandas, color: "#E70488" },
+  NumPy: { Icon: SiNumpy, color: "#6C9BEA" },
+  Matplotlib: { Icon: BarChart3, color: "#5FA8D3" },
   Django: { Icon: SiDjango, color: "#44B78B" },
   React: { Icon: SiReact, color: "#61DAFB" },
   Streamlit: { Icon: SiStreamlit, color: "#FF4B4B" },
   Git: { Icon: SiGit, color: "#F05032" },
-  "REST APIs": { Icon: SiGraphql, color: "#A78BFA" },
+  "REST APIs": { Icon: Plug, color: "#A78BFA" },
   Unity: { Icon: SiUnity, color: "#FFFFFF" },
 };
 
-/* ---------- SKILL CATEGORIES ---------- */
 const skillCategories = [
   {
     title: "Languages",
@@ -151,42 +198,111 @@ const skillCategories = [
   },
 ];
 
-function SkillChip({ name }: { name: string }) {
+const CV_LANGUAGES = [
+  {
+    lang: "en",
+    label: "English",
+    flag: "🇬🇧",
+    href: "/cv-en.pdf",
+    file: "Maram_Achraf_CV_EN.pdf",
+  },
+  {
+    lang: "fr",
+    label: "Français",
+    flag: "🇫🇷",
+    href: "/cv-fr.pdf",
+    file: "Maram_Achraf_CV_FR.pdf",
+  },
+] as const;
+
+/* ---------- Section heading ---------- */
+function SectionHeading({
+  lead,
+  accent,
+  sub,
+}: {
+  lead: string;
+  accent: string;
+  sub?: string;
+}) {
+  return (
+    <div data-reveal>
+      <h3 className="font-display text-3xl text-white sm:text-4xl">
+        {lead}{" "}
+        <span className="italic" style={{ color: ACCENT_TEXT }}>
+          {accent}
+        </span>
+      </h3>
+      {sub && (
+        <p className="mt-4 max-w-2xl font-sans text-[0.95rem] leading-[1.7] text-white/65">
+          {sub}
+        </p>
+      )}
+    </div>
+  );
+}
+
+/* ---------- Skill chip — cool blue glass ---------- */
+function SkillChip({ name, index }: { name: string; index: number }) {
   const entry = skillIcons[name];
   const Icon = entry?.Icon;
   const [isHovered, setIsHovered] = useState(false);
 
+  const stamp = String(index + 1).padStart(2, "0");
+
   return (
     <div
-      className="group/chip flex shrink-0 items-center gap-2.5 rounded-xl border border-border/30 bg-black/80 px-4 py-2.5 backdrop-blur transition-all duration-300 hover:border-primary/50"
+      className="group/chip relative flex shrink-0 items-center gap-2.5 rounded-xl border px-4 py-2.5 backdrop-blur-xl transition-[transform,border-color,box-shadow] duration-300 ease-out"
       style={{
-        borderColor: isHovered && entry?.color ? entry.color : undefined,
-        boxShadow:
-          isHovered && entry?.color ? `0 0 20px ${entry.color}33` : undefined,
-        backgroundColor: isHovered ? "rgba(0,0,0,0.9)" : "rgba(0,0,0,0.8)",
+        backgroundImage: [CHIP_TINT, GLASS_BASE_CARD].join(", "),
+        borderColor:
+          isHovered && entry?.color ? entry.color : "rgba(255,255,255,0.10)",
+        transform: isHovered ? "translateY(-2px)" : "translateY(0)",
+        boxShadow: isHovered
+          ? `0 14px 30px -14px ${entry?.color ?? "rgba(96,165,250,0.6)"}66, 0 1px 0 rgba(255,255,255,0.16) inset`
+          : "0 1px 0 rgba(255,255,255,0.10) inset",
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
+      <span
+        className="font-mono text-[0.58rem] tabular-nums transition-colors duration-300"
+        style={{
+          color: isHovered
+            ? "rgba(147,197,253,0.95)"
+            : "rgba(255,255,255,0.32)",
+        }}
+      >
+        {stamp}
+      </span>
+
+      <span
+        aria-hidden
+        className="h-3 w-px transition-colors duration-300"
+        style={{
+          background: isHovered
+            ? "rgba(147,197,253,0.55)"
+            : "rgba(255,255,255,0.12)",
+        }}
+      />
+
       {Icon ? (
         <Icon
-          className="h-5 w-5 shrink-0 transition-all duration-300 group-hover/chip:scale-110"
+          className="h-4 w-4 shrink-0 transition-transform duration-300 motion-reduce:transition-none"
           style={{
             color: entry.color,
-            filter: isHovered
-              ? `drop-shadow(0 0 8px ${entry.color}66)`
-              : undefined,
+            transform: isHovered ? "scale(1.12)" : "scale(1)",
           }}
         />
       ) : (
-        <Sparkles className="h-5 w-5 shrink-0 text-violet-glow" />
+        <Sparkles className="h-4 w-4 shrink-0 text-white/50" />
       )}
+
       <span
-        className="whitespace-nowrap text-sm font-medium transition-colors duration-300"
+        className="whitespace-nowrap font-sans text-sm font-medium transition-colors duration-300"
         style={{
           color:
             isHovered && entry?.color ? entry.color : "rgba(255,255,255,0.85)",
-          opacity: isHovered ? 1 : 0.85,
         }}
       >
         {name}
@@ -195,6 +311,7 @@ function SkillChip({ name }: { name: string }) {
   );
 }
 
+/* ---------- Skill marquee row ---------- */
 function SkillCategoryRow({
   category,
   duration,
@@ -208,25 +325,12 @@ function SkillCategoryRow({
 
   return (
     <div className="space-y-2" data-skill-row>
-      <div className="flex items-center gap-2 px-1">
-        <h4
-          className="font-mono text-xs uppercase tracking-[0.2em] text-white select-none"
-          style={{
-            textShadow:
-              "0 0 10px rgba(255,255,255,0.3), 0 0 20px rgba(255,255,255,0.1)",
-          }}
-        >
+      <div className="flex items-baseline justify-between gap-3 px-1">
+        <h4 className="font-sans text-[0.95rem] font-semibold text-white select-none">
           {category.title}
         </h4>
-        <span className="flex-1 border-t border-white/10" />
-        <span
-          className="font-mono text-[0.6rem] text-white/40"
-          style={{
-            textShadow:
-              "0 0 10px rgba(255,255,255,0.2), 0 0 20px rgba(255,255,255,0.05)",
-          }}
-        >
-          {category.items.length}
+        <span className="font-sans text-[0.78rem] text-white/55">
+          {String(category.items.length).padStart(2, "0")} tools
         </span>
       </div>
       <div className="marquee-track marquee-mask overflow-hidden py-1">
@@ -238,7 +342,11 @@ function SkillCategoryRow({
           }}
         >
           {doubled.map((name, i) => (
-            <SkillChip key={`${category.title}-${name}-${i}`} name={name} />
+            <SkillChip
+              key={`${category.title}-${name}-${i}`}
+              name={name}
+              index={i % category.items.length}
+            />
           ))}
         </div>
       </div>
@@ -246,204 +354,537 @@ function SkillCategoryRow({
   );
 }
 
-/* ---------- 3D tilt profile card ---------- */
-function ProfileCard() {
-  const ref = useRef<HTMLDivElement>(null);
-  const [hovered, setHovered] = useState(false);
-  const rx = useSpring(useMotionValue(0), { stiffness: 150, damping: 18 });
-  const ry = useSpring(useMotionValue(0), { stiffness: 150, damping: 18 });
+/* ---------- Portrait — Mission Patch ---------- */
+function GlassPortrait() {
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const patchRef = useRef<HTMLDivElement>(null);
+  const [isHovered, setIsHovered] = useState(false);
+
+  const gx = useMotionValue(50);
+  const gy = useMotionValue(50);
+  const haloX = useSpring(gx, { stiffness: 100, damping: 22 });
+  const haloY = useSpring(gy, { stiffness: 100, damping: 22 });
+  const halo = useMotionTemplate`radial-gradient(circle at ${haloX}% ${haloY}%, rgba(219,234,254,0.42) 0%, rgba(167,139,250,0.22) 30%, transparent 68%)`;
 
   function onMove(e: React.MouseEvent) {
-    const el = ref.current;
+    const el = patchRef.current;
     if (!el) return;
     const r = el.getBoundingClientRect();
-    const px = (e.clientX - r.left) / r.width;
-    const py = (e.clientY - r.top) / r.height;
-    ry.set((px - 0.5) * 16);
-    rx.set((0.5 - py) * 16);
-  }
-  function onLeave() {
-    rx.set(0);
-    ry.set(0);
-    setHovered(false);
+    gx.set(((e.clientX - r.left) / r.width) * 100);
+    gy.set(((e.clientY - r.top) / r.height) * 100);
   }
 
+  useLayoutEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        el,
+        { y: 40, opacity: 0, scale: 0.96 },
+        {
+          y: 0,
+          opacity: 1,
+          scale: 1,
+          duration: 1.1,
+          ease: "power3.out",
+          scrollTrigger: { trigger: el, start: "top 90%", once: true },
+        }
+      );
+    }, wrapRef);
+
+    return () => ctx.revert();
+  }, []);
+
   return (
-    <div className="[perspective:1200px]">
-      <motion.div
-        ref={ref}
-        onMouseMove={onMove}
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={onLeave}
-        style={{ rotateX: rx, rotateY: ry, transformStyle: "preserve-3d" }}
-        className="group relative mx-auto w-full max-w-sm rounded-3xl border border-border/50 bg-card p-3 shadow-[var(--shadow-card)] transition-shadow duration-300 hover:shadow-xl"
-      >
-        <div className="relative overflow-hidden rounded-2xl">
-          <img
-            src={profileImage}
-            alt={`${profile.name} — ${profile.role}`}
-            className="aspect-[3/4] w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
-            draggable={false}
-          />
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/80 via-background/5 to-transparent" />
-          <div
-            className="pointer-events-none absolute inset-0 opacity-0 mix-blend-overlay transition-opacity duration-300 group-hover:opacity-100"
+    <div className="relative flex justify-center lg:justify-end">
+      <div ref={wrapRef} className="relative will-change-transform">
+        <motion.span
+          aria-hidden
+          className="pointer-events-none absolute left-1/2 top-[42%] -z-10 h-[440px] w-[440px] -translate-x-1/2 -translate-y-1/2 rounded-full"
+          style={{
+            background: halo,
+            filter: "blur(60px)",
+            opacity: isHovered ? 0.95 : 0.6,
+            transition: "opacity 500ms ease",
+          }}
+        />
+
+        <div
+          ref={patchRef}
+          onMouseMove={onMove}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          className="relative mx-auto aspect-square w-[300px] sm:w-[340px] md:w-[380px]"
+        >
+          <svg
+            viewBox="0 0 200 200"
+            className="pointer-events-none absolute inset-0 h-full w-full transition-transform duration-[1200ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none"
             style={{
-              backgroundImage:
-                "linear-gradient(115deg, transparent 30%, rgba(255,255,255,0.08) 45%, rgba(255,255,255,0.06) 55%, transparent 70%)",
+              transform: isHovered ? "rotate(55deg)" : "rotate(0deg)",
             }}
+            aria-hidden
+          >
+            <circle
+              cx="100"
+              cy="100"
+              r="96"
+              fill="none"
+              stroke="rgba(255,255,255,0.09)"
+              strokeWidth="1"
+            />
+            <path
+              d="M 100, 4 A 96, 96 0 0 1 196, 100"
+              fill="none"
+              stroke="rgba(219,234,254,0.9)"
+              strokeWidth="1.4"
+              strokeLinecap="round"
+            />
+            <path
+              d="M 100, 196 A 96, 96 0 0 1 4, 100"
+              fill="none"
+              stroke="rgba(192,132,252,0.6)"
+              strokeWidth="1.1"
+              strokeLinecap="round"
+            />
+          </svg>
+
+          <span
+            aria-hidden
+            className="pointer-events-none absolute left-1/2 top-0 h-3.5 w-px -translate-x-1/2 bg-white/45"
           />
+          <span
+            aria-hidden
+            className="pointer-events-none absolute bottom-0 left-1/2 h-3.5 w-px -translate-x-1/2 bg-white/45"
+          />
+          <span
+            aria-hidden
+            className="pointer-events-none absolute left-0 top-1/2 h-px w-3.5 -translate-y-1/2 bg-white/45"
+          />
+          <span
+            aria-hidden
+            className="pointer-events-none absolute right-0 top-1/2 h-px w-3.5 -translate-y-1/2 bg-white/45"
+          />
+
           <div
-            className="absolute left-3 top-3 flex items-center gap-2 rounded-md border border-white/10 bg-background/60 px-2 py-1 font-mono text-[0.55rem] uppercase tracking-[0.2em] text-white/60 backdrop-blur"
-            style={{ transform: "translateZ(40px)" }}
+            className="absolute inset-[18px] overflow-hidden rounded-full border backdrop-blur-2xl transition-shadow duration-500"
+            style={{
+              backgroundImage: [GLASS_TINT, GLASS_BASE_CARD].join(", "),
+              borderColor: isHovered
+                ? "rgba(219,234,254,0.5)"
+                : "rgba(255,255,255,0.22)",
+              boxShadow: isHovered
+                ? "0 30px 80px -30px rgba(0,0,0,0.85), 0 1px 0 rgba(255,255,255,0.25) inset, 0 0 80px -18px rgba(167,139,250,0.7)"
+                : "0 30px 70px -30px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.20) inset, 0 0 50px -20px rgba(167,139,250,0.5)",
+            }}
           >
-            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-magic-mint/70" />
-            About
-          </div>
-          <div
-            className="absolute inset-x-3 bottom-3"
-            style={{ transform: "translateZ(55px)" }}
-          >
-            <p className="font-display text-3xl italic leading-none text-white/90 drop-shadow-lg">
-              {profile.name}
-            </p>
-            <p className="mt-1.5 font-mono text-[0.6rem] uppercase tracking-[0.25em] text-white/60 drop-shadow-lg">
-              {profile.role}
-            </p>
+            <div className="h-full w-full overflow-hidden rounded-full p-3">
+              <img
+                src={profileImage}
+                alt="Portrait of Maram Jebali"
+                width={400}
+                height={400}
+                className="h-full w-full rounded-full object-cover transition-transform duration-700 motion-reduce:transition-none"
+                style={{ transform: isHovered ? "scale(1.04)" : "scale(1)" }}
+                draggable={false}
+              />
+            </div>
+
+            <span
+              aria-hidden
+              className="pointer-events-none absolute inset-0 rounded-full opacity-35"
+              style={{
+                backgroundImage:
+                  "repeating-conic-gradient(from 0deg, rgba(255,255,255,0.06) 0deg 1deg, transparent 1deg 30deg)",
+              }}
+            />
+            <span
+              aria-hidden
+              className="pointer-events-none absolute inset-0 rounded-full"
+              style={{
+                background:
+                  "radial-gradient(circle at 50% 120%, rgba(12,6,40,0.45) 0%, transparent 55%)",
+              }}
+            />
+            <span
+              aria-hidden
+              className="pointer-events-none absolute inset-0 rounded-full"
+              style={{
+                background:
+                  "radial-gradient(circle at 50% -20%, rgba(255,255,255,0.28) 0%, transparent 45%)",
+              }}
+            />
           </div>
         </div>
-      </motion.div>
+
+        {/* Caption — name below the portrait */}
+        <div className="relative mt-10 text-center">
+          <p className="font-display text-2xl italic leading-tight text-white md:text-[1.85rem]">
+            Maram Jebali
+          </p>
+          <p className="mt-3 font-mono text-[0.62rem] uppercase tracking-[0.32em] text-white/60">
+            {profile.role}
+          </p>
+          <p className="mt-2 font-mono text-[0.58rem] uppercase tracking-[0.32em] text-white/35">
+            Mission № 01
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
 
-/* ---------- CERTIFICATION CARD ---------- */
+/* ---------- Experience ---------- */
+const ROW_GRID =
+  "grid grid-cols-[auto_1fr_auto] md:grid-cols-[150px_auto_1fr_auto] gap-4 md:gap-6";
+
+function ExperienceItem({
+  exp,
+  isExpanded,
+  onToggle,
+  panelId,
+}: {
+  exp: Experience;
+  isExpanded: boolean;
+  onToggle: () => void;
+  panelId: string;
+}) {
+  const period = exp.period.replace(" · 2 mos", "");
+  const location = exp.location
+    ?.replace(" · Hybrid", "")
+    .replace(" · On-site", "");
+
+  return (
+    <div>
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={isExpanded}
+        aria-controls={panelId}
+        className={`group w-full rounded-xl text-left transition-colors duration-300 ${FOCUS_RING}`}
+      >
+        <div className={`${ROW_GRID} items-start py-5 md:items-center`}>
+          <span className="hidden text-right font-sans text-[0.85rem] text-white/60 transition-colors duration-300 group-hover:text-white/85 md:block">
+            {period}
+          </span>
+
+          <div className="mt-2 flex w-2.5 justify-center md:mt-0">
+            <span
+              className={`relative z-10 h-2.5 w-2.5 rounded-full transition-all duration-300 ${
+                isExpanded
+                  ? "bg-white shadow-[0_0_14px_rgba(219,234,254,0.7)]"
+                  : "bg-white/40 group-hover:bg-white/70"
+              }`}
+            />
+          </div>
+
+          <div className="flex min-w-0 items-center gap-4">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center md:h-12 md:w-12">
+              <img
+                src={exp.logo}
+                alt=""
+                width={40}
+                height={40}
+                className="h-8 w-8 object-contain md:h-10 md:w-10"
+                loading="lazy"
+              />
+            </div>
+
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
+                <p className="font-sans text-base font-semibold tracking-tight text-white md:text-[1.075rem]">
+                  {exp.role}
+                </p>
+                {exp.current && (
+                  <span
+                    className="rounded-full px-2.5 py-0.5 font-sans text-[0.72rem] font-medium"
+                    style={{
+                      background: "rgba(219,234,254,0.16)",
+                      color: "rgba(219,234,254,0.95)",
+                    }}
+                  >
+                    Current
+                  </span>
+                )}
+              </div>
+
+              <p className="mt-0.5 font-sans text-[0.9rem] text-white/75">
+                {exp.company}
+                {location ? (
+                  <span className="text-white/55"> · {location}</span>
+                ) : null}
+              </p>
+
+              <p className="mt-0.5 font-sans text-[0.8rem] text-white/55 md:hidden">
+                {period}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex w-4 justify-end">
+            <ChevronDown
+              aria-hidden
+              className={`h-4 w-4 transition-transform duration-500 ${
+                isExpanded
+                  ? "rotate-180 text-white/85"
+                  : "text-white/50 group-hover:text-white/75"
+              }`}
+            />
+          </div>
+        </div>
+      </button>
+
+      <div
+        id={panelId}
+        role="region"
+        aria-hidden={!isExpanded}
+        className={`grid transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+          isExpanded
+            ? "grid-rows-[1fr] opacity-100"
+            : "grid-rows-[0fr] opacity-0"
+        }`}
+      >
+        <div className="overflow-hidden">
+          <div className={ROW_GRID}>
+            <div className="hidden md:block" />
+            <div className="w-2.5" />
+            <div className="pb-8">
+              <div
+                className={
+                  exp.image
+                    ? "grid gap-6 md:grid-cols-[1.2fr_1fr] md:items-start md:gap-8"
+                    : ""
+                }
+              >
+                <div>
+                  <p className="max-w-[65ch] font-sans text-[0.95rem] leading-[1.75] text-white/80">
+                    {exp.desc}
+                  </p>
+
+                  {exp.bullets && exp.bullets.length > 0 && (
+                    <ul className="mt-5 max-w-[65ch] space-y-2.5">
+                      {exp.bullets.map((b, idx) => (
+                        <li
+                          key={idx}
+                          className="flex gap-3 font-sans text-[0.9rem] leading-[1.7] text-white/72"
+                        >
+                          <span
+                            className="mt-[0.7rem] h-1 w-1 shrink-0 rounded-full"
+                            style={{ background: "rgba(219,234,254,0.7)" }}
+                          />
+                          <span>{b}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+
+                  {exp.tech && exp.tech.length > 0 && (
+                    <ul className="mt-6 flex flex-wrap gap-2">
+                      {exp.tech.map((t, idx) => (
+                        <li
+                          key={idx}
+                          className="rounded-md border px-2.5 py-1 font-sans text-[0.78rem] font-medium"
+                          style={{
+                            borderColor: "rgba(255,255,255,0.16)",
+                            background: "rgba(255,255,255,0.04)",
+                            color: "rgba(255,255,255,0.78)",
+                          }}
+                        >
+                          {t}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+
+                {exp.image && (
+                  <div
+                    className="relative overflow-hidden rounded-2xl border"
+                    style={{
+                      borderColor: "rgba(255,255,255,0.12)",
+                      background: "rgba(255,255,255,0.03)",
+                    }}
+                  >
+                    <img
+                      src={exp.image}
+                      alt={`${exp.company} — team or project photo`}
+                      className="h-full w-full object-cover"
+                      style={{ aspectRatio: "4 / 3" }}
+                      loading="lazy"
+                      onError={(e) => {
+                        const parent = (e.target as HTMLImageElement)
+                          .parentElement?.parentElement;
+                        if (parent) parent.style.display = "none";
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="w-4" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ExperienceList() {
+  const [openIndex, setOpenIndex] = useState<number | null>(0);
+
+  return (
+    <div className="relative">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-y-0 left-[4.5px] w-px md:left-[178.5px]"
+        style={{ background: "rgba(255,255,255,0.14)" }}
+      />
+      <div className="relative flex flex-col">
+        {experiences.map((exp, i) => (
+          <div key={`${exp.company}-${i}`} data-exp-row>
+            <ExperienceItem
+              exp={exp}
+              panelId={`exp-panel-${i}`}
+              isExpanded={openIndex === i}
+              onToggle={() => setOpenIndex(openIndex === i ? null : i)}
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Certification card — NVIDIA credential tile ---------- */
 function CertificationCard({
   cert,
   index,
+  total,
   onOpen,
 }: {
-  cert: (typeof certifications)[0];
+  cert: Certification;
   index: number;
+  total: number;
   onOpen: (index: number) => void;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
-  const rx = useSpring(useMotionValue(0), { stiffness: 150, damping: 18 });
-  const ry = useSpring(useMotionValue(0), { stiffness: 150, damping: 18 });
-  const gx = useMotionValue(50);
-  const gy = useMotionValue(50);
-  const glow = useMotionTemplate`radial-gradient(circle at ${gx}% ${gy}%, oklch(0.7 0.22 300 / 0.25), transparent 55%)`;
-
-  function onMove(e: React.MouseEvent) {
-    const el = ref.current;
-    if (!el) return;
-    const r = el.getBoundingClientRect();
-    const px = (e.clientX - r.left) / r.width;
-    const py = (e.clientY - r.top) / r.height;
-    ry.set((px - 0.5) * 12);
-    rx.set((0.5 - py) * 12);
-    gx.set(px * 100);
-    gy.set(py * 100);
-  }
-  function onLeave() {
-    rx.set(0);
-    ry.set(0);
-    setIsHovered(false);
-  }
-
-  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    onOpen(index);
-  };
-
-  const imagePath = certificationImages[index] || certificationImages[0];
+  const stamp = String(index + 1).padStart(2, "0");
+  const totalStamp = String(total).padStart(2, "0");
 
   return (
     <motion.button
       type="button"
-      className="[perspective:1200px] flex-shrink-0 w-[380px] cursor-pointer text-left"
-      onClick={handleClick}
-      whileHover={{ scale: 1.03 }}
-      whileTap={{ scale: 0.97 }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      onClick={(e) => {
+        e.preventDefault();
+        onOpen(index);
+      }}
+      whileTap={{ scale: 0.98 }}
+      aria-label={`View credential: ${cert.title}`}
+      className={`group relative flex h-[250px] w-[280px] shrink-0 cursor-pointer flex-col justify-between rounded-2xl border p-5 text-left backdrop-blur-2xl transition-[border-color,transform,box-shadow] duration-300 sm:w-[300px] ${FOCUS_RING}`}
+      style={{
+        backgroundImage: [GLASS_TINT, GLASS_BASE_CARD].join(", "),
+        borderColor: isHovered
+          ? "rgba(118,185,0,0.45)"
+          : "rgba(255,255,255,0.14)",
+        transform: isHovered ? "translateY(-4px)" : "translateY(0)",
+        boxShadow: isHovered
+          ? "0 24px 55px -22px rgba(118,185,0,0.35), 0 1px 0 rgba(255,255,255,0.16) inset"
+          : "0 1px 0 rgba(255,255,255,0.10) inset",
+      }}
     >
-      <motion.div
-        ref={ref}
-        onMouseMove={onMove}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={onLeave}
-        style={{ rotateX: rx, rotateY: ry, transformStyle: "preserve-3d" }}
-        className="group relative w-full rounded-2xl border border-border/30 bg-black/80 p-3 backdrop-blur transition-all duration-300 hover:border-primary/40 hover:shadow-[0_0_40px_rgba(120,100,255,0.15)]"
-      >
-        <motion.div
-          aria-hidden
-          style={{ background: glow }}
-          className="pointer-events-none absolute inset-0 z-10 rounded-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-        />
-
-        <div className="relative overflow-hidden rounded-xl aspect-[4/3]">
-          <img
-            src={imagePath}
-            alt={cert.title}
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
-            draggable={false}
-            onError={(e) => {
-              (e.target as HTMLImageElement).src = "/placeholder-cert.png";
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <span
+            className="grid h-11 w-11 place-items-center rounded-xl border transition-all duration-300"
+            style={{
+              borderColor: isHovered
+                ? "rgba(118,185,0,0.5)"
+                : "rgba(255,255,255,0.14)",
+              background: isHovered
+                ? "rgba(118,185,0,0.10)"
+                : "rgba(255,255,255,0.03)",
+              boxShadow: isHovered
+                ? "0 0 22px -8px rgba(118,185,0,0.75) inset"
+                : "none",
             }}
-          />
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-          <span className="pointer-events-none absolute left-2 top-2 h-5 w-5 border-l-2 border-t-2 border-white/20" />
-          <span className="pointer-events-none absolute right-2 top-2 h-5 w-5 border-r-2 border-t-2 border-white/20" />
-          <span className="pointer-events-none absolute bottom-2 left-2 h-5 w-5 border-b-2 border-l-2 border-white/20" />
-          <span className="pointer-events-none absolute bottom-2 right-2 h-5 w-5 border-b-2 border-r-2 border-white/20" />
+          >
+            <SiNvidia
+              className="h-6 w-6 transition-transform duration-300 motion-reduce:transition-none"
+              style={{
+                color: NVIDIA_GREEN,
+                transform: isHovered ? "scale(1.1)" : "scale(1)",
+              }}
+            />
+          </span>
+          <div className="leading-tight">
+            <p className="font-mono text-[0.62rem] uppercase tracking-[0.26em] text-white/65">
+              NVIDIA
+            </p>
+            <p className="mt-0.5 font-mono text-[0.55rem] uppercase tracking-[0.26em] text-white/35">
+              Certificate
+            </p>
+          </div>
         </div>
 
-        <div
-          className="absolute bottom-4 right-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-          style={{ transform: "translateZ(30px)" }}
+        <span className="font-mono text-[0.55rem] tabular-nums text-white/35">
+          {stamp}/{totalStamp}
+        </span>
+      </div>
+
+      <p className="font-display text-xl italic leading-[1.25] text-white line-clamp-3">
+        {cert.title}
+      </p>
+
+      <div className="flex items-center justify-between border-t border-white/[0.08] pt-3">
+        <p
+          className="font-mono text-[0.58rem] uppercase tracking-[0.24em] transition-colors duration-300"
+          style={{
+            color: isHovered ? "rgba(118,185,0,0.95)" : "rgba(255,255,255,0.45)",
+          }}
         >
-          <span className="text-[0.5rem] font-mono uppercase tracking-[0.1em] text-white/40 bg-black/50 px-2 py-1 rounded backdrop-blur">
-            Click to expand ✦
-          </span>
-        </div>
-      </motion.div>
+          View credential
+        </p>
+        <ArrowUpRight
+          className="h-4 w-4 transition-all duration-300 motion-reduce:transition-none"
+          style={{
+            color: isHovered ? NVIDIA_GREEN : "rgba(255,255,255,0.45)",
+            transform: isHovered
+              ? "translate(2px, -2px)"
+              : "translate(0, 0)",
+          }}
+        />
+      </div>
     </motion.button>
   );
 }
 
+/* ---------- Certification marquee row ---------- */
 function CertificationRow({
-  certifications,
-  duration = 40,
+  items,
+  duration = 55,
   onSelect,
 }: {
-  certifications: any[];
+  items: Certification[];
   duration?: number;
   onSelect: (index: number) => void;
 }) {
-  const doubled = [...certifications, ...certifications];
+  const doubled = [...items, ...items];
 
   return (
     <div className="space-y-2" data-cert-row>
       <div className="flex items-center gap-2 px-1">
-        <h4
-          className="font-mono text-xs uppercase tracking-[0.2em] text-white select-none"
-          style={{
-            textShadow:
-              "0 0 10px rgba(255,255,255,0.3), 0 0 20px rgba(255,255,255,0.1)",
-          }}
-        >
+        <h4 className="font-sans text-[0.95rem] font-semibold text-white select-none">
           Credentials
         </h4>
-        <span className="flex-1 border-t border-white/10" />
         <span
-          className="font-mono text-[0.6rem] text-white/40"
-          style={{
-            textShadow:
-              "0 0 10px rgba(255,255,255,0.2), 0 0 20px rgba(255,255,255,0.05)",
-          }}
-        >
-          {certifications.length}
+          className="flex-1 border-t"
+          style={{ borderColor: "rgba(255,255,255,0.10)" }}
+        />
+        <span className="font-sans text-[0.78rem] text-white/55">
+          {String(items.length).padStart(2, "0")} earned
         </span>
       </div>
       <div className="marquee-track marquee-mask overflow-hidden py-3">
@@ -458,7 +899,8 @@ function CertificationRow({
             <CertificationCard
               key={`${cert.credentialId}-${i}`}
               cert={cert}
-              index={i % certifications.length}
+              index={i % items.length}
+              total={items.length}
               onOpen={onSelect}
             />
           ))}
@@ -468,98 +910,116 @@ function CertificationRow({
   );
 }
 
-/* ---------- MAIN ABOUT SECTION ---------- */
-export function AboutSection() {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const cardWrapRef = useRef<HTMLDivElement>(null);
-  const dividerRef = useRef<HTMLDivElement>(null);
-  const rightColRef = useRef<HTMLDivElement>(null);
-
+/* ---------- CV menu ---------- */
+function InlineCVMenu() {
+  const [open, setOpen] = useState(false);
   const [status, setStatus] = useState<"idle" | "downloading" | "done">("idle");
-  const [selectedCertIndex, setSelectedCertIndex] = useState<number | null>(
-    null,
-  );
+  const ref = useRef<HTMLDivElement>(null);
+  const timer = useRef<number | undefined>(undefined);
 
-  const handleDownload = async () => {
-    if (status === "downloading") return;
+  useEffect(() => () => window.clearTimeout(timer.current), []);
+
+  useEffect(() => {
+    if (!open) return;
+    const onClick = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node))
+        setOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    document.addEventListener("mousedown", onClick);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onClick);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
+  const download = (opt: (typeof CV_LANGUAGES)[number]) => {
+    setOpen(false);
     setStatus("downloading");
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      const link = document.createElement("a");
-      link.href = "/cv.pdf";
-      link.download = "Maram_CV.pdf";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+    const link = document.createElement("a");
+    link.href = opt.href;
+    link.download = opt.file;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    timer.current = window.setTimeout(() => {
       setStatus("done");
-      setTimeout(() => setStatus("idle"), 2500);
-    } catch (error) {
-      console.error("Download failed:", error);
-      setStatus("idle");
-    }
+      timer.current = window.setTimeout(() => setStatus("idle"), 2200);
+    }, 500);
   };
 
-  /* ---------- GSAP scroll choreography ---------- */
+  return (
+    <div ref={ref} className="relative inline-block">
+      <ButtonCV
+        status={status}
+        onClick={() => setOpen((v) => !v)}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        trailing={
+          <ChevronDown
+            aria-hidden
+            className={`h-4 w-4 transition-transform duration-300 ${
+              open ? "rotate-180" : ""
+            }`}
+          />
+        }
+      />
+
+      {open && (
+        <div
+          role="menu"
+          className="absolute left-0 top-full z-20 mt-2 w-52 overflow-hidden rounded-2xl border backdrop-blur-2xl"
+          style={{
+            backgroundImage: [GLASS_TINT, GLASS_BASE_DEEP].join(", "),
+            borderColor: GLASS_BORDER,
+            boxShadow:
+              "0 22px 50px -22px rgba(0,0,0,0.7), 0 1px 0 rgba(255,255,255,0.18) inset",
+          }}
+        >
+          <p className="border-b border-white/10 px-4 py-2.5 font-sans text-[0.78rem] text-white/60">
+            Choose a language (PDF)
+          </p>
+          {CV_LANGUAGES.map((opt) => (
+            <button
+              key={opt.lang}
+              type="button"
+              role="menuitem"
+              onClick={() => download(opt)}
+              className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left font-sans text-[0.92rem] text-white/80 transition-colors hover:bg-white/[0.1] hover:text-white focus-visible:bg-white/[0.1] focus-visible:outline-none"
+            >
+              <span>{opt.label}</span>
+              <span aria-hidden>{opt.flag}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ---------- Main ---------- */
+export function AboutSection({
+  onNavigate,
+}: {
+  onNavigate?: (key: SectionKey) => void;
+}) {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const leftColRef = useRef<HTMLDivElement>(null);
+
+  const [selectedCertIndex, setSelectedCertIndex] = useState<number | null>(
+    null
+  );
+
   useLayoutEffect(() => {
     const root = sectionRef.current;
     if (!root) return;
-
-    const prefersReduced = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-    if (prefersReduced) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const ctx = gsap.context(() => {
-      if (dividerRef.current) {
-        gsap.fromTo(
-          dividerRef.current,
-          { scaleX: 0, transformOrigin: "center center", opacity: 0 },
-          {
-            scaleX: 1,
-            opacity: 1,
-            duration: 1,
-            ease: "power3.inOut",
-            scrollTrigger: {
-              trigger: dividerRef.current,
-              start: "top 88%",
-              once: true,
-            },
-          },
-        );
-      }
-
-      if (cardWrapRef.current) {
-        gsap.fromTo(
-          cardWrapRef.current,
-          { y: 60, opacity: 0, rotateX: 8, transformPerspective: 1000 },
-          {
-            y: 0,
-            opacity: 1,
-            rotateX: 0,
-            duration: 1.1,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: cardWrapRef.current,
-              start: "top 85%",
-              once: true,
-            },
-          },
-        );
-
-        gsap.to(cardWrapRef.current, {
-          y: -50,
-          ease: "none",
-          scrollTrigger: {
-            trigger: root,
-            start: "top bottom",
-            end: "bottom top",
-            scrub: 0.6,
-          },
-        });
-      }
-
-      if (rightColRef.current) {
-        const items = rightColRef.current.querySelectorAll("[data-cascade]");
+      if (leftColRef.current) {
+        const items = leftColRef.current.querySelectorAll("[data-cascade]");
         gsap.fromTo(
           items,
           { y: 24, opacity: 0 },
@@ -570,11 +1030,45 @@ export function AboutSection() {
             stagger: 0.08,
             ease: "power3.out",
             scrollTrigger: {
-              trigger: rightColRef.current,
-              start: "top 82%",
+              trigger: leftColRef.current,
+              start: "top 90%",
               once: true,
             },
-          },
+          }
+        );
+      }
+
+      root.querySelectorAll("[data-reveal]").forEach((el) => {
+        gsap.fromTo(
+          el,
+          { y: 24, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.8,
+            ease: "power3.out",
+            scrollTrigger: { trigger: el, start: "top 90%", once: true },
+          }
+        );
+      });
+
+      const expRows = root.querySelectorAll("[data-exp-row]");
+      if (expRows.length) {
+        gsap.fromTo(
+          expRows,
+          { y: 20, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.7,
+            stagger: 0.08,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: expRows[0],
+              start: "top 88%",
+              once: true,
+            },
+          }
         );
       }
 
@@ -582,19 +1076,19 @@ export function AboutSection() {
       if (skillRows.length) {
         gsap.fromTo(
           skillRows,
-          { y: 32, opacity: 0 },
+          { y: 24, opacity: 0 },
           {
             y: 0,
             opacity: 1,
-            duration: 0.8,
+            duration: 0.7,
             stagger: 0.09,
             ease: "power3.out",
             scrollTrigger: {
-              trigger: skillRows[0] as Element,
-              start: "top 85%",
+              trigger: skillRows[0],
+              start: "top 88%",
               once: true,
             },
-          },
+          }
         );
       }
 
@@ -602,147 +1096,124 @@ export function AboutSection() {
       if (certRow) {
         gsap.fromTo(
           certRow,
-          { y: 32, opacity: 0 },
+          { y: 24, opacity: 0 },
           {
             y: 0,
             opacity: 1,
             duration: 0.9,
             ease: "power3.out",
-            scrollTrigger: {
-              trigger: certRow,
-              start: "top 85%",
-              once: true,
-            },
-          },
+            scrollTrigger: { trigger: certRow, start: "top 88%", once: true },
+          }
         );
       }
-
-      const headings = root.querySelectorAll("[data-heading]");
-      headings.forEach((h) => {
-        gsap.fromTo(
-          h,
-          { y: 20, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.8,
-            ease: "power3.out",
-            scrollTrigger: { trigger: h, start: "top 88%", once: true },
-          },
-        );
-      });
     }, root);
 
     return () => ctx.revert();
   }, []);
 
+  const NameHeading = SHOW_HERO ? "h2" : "h1";
+
   return (
     <div ref={sectionRef} className="relative">
-      {/* Cosmic background */}
       <motion.div
-        className="fixed inset-0 z-0"
+        className="pointer-events-none fixed inset-0 z-0"
         initial={{ opacity: 0 }}
         animate={{ opacity: ABOUT_STARFIELD_OPACITY }}
         transition={{ duration: 1.8, ease: "easeOut" }}
       >
-        <StarField count={40} />
+        <StarField count={180} />
       </motion.div>
 
-      <div className="relative z-10 mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-28">
-        {/* Animated rule only — no "01 — About" text */}
-        <SectionEyebrow className="mb-12" />
-
-        {/* Full-width manifesto — centered */}
-        <div className="mb-14 flex w-full justify-center">
-          <HeroManifesto
-            name={profile.name}
-            role={profile.role}
-            location={profile.location}
-            tagline="Building full-stack AI solutions."
-            introImages={[profileImage]}
-          />
-        </div>
-
-        {/* Divider */}
-        <div
-          ref={dividerRef}
-          className="mb-16 h-px w-full bg-gradient-to-r from-transparent via-white/15 to-transparent"
-        />
-
-        {/* Two-column editorial block */}
-        <div className="grid items-start gap-12 lg:grid-cols-[0.8fr_1fr] lg:gap-16">
-          {/* Profile card */}
-          <div ref={cardWrapRef}>
-            <ProfileCard />
+      <div className="relative z-10 mx-auto max-w-6xl px-5 py-24 sm:px-8 sm:py-32">
+        {SHOW_HERO && (
+          <div className="mb-14 flex w-full justify-center">
+            <HeroManifesto
+              name={profile.name}
+              role={profile.role}
+              location={profile.location}
+              tagline="Building full-stack AI solutions."
+              introImages={[profileImage]}
+            />
           </div>
+        )}
 
-          {/* Bio + CTA + chips */}
-          <div ref={rightColRef}>
-            <h2
+        <div className="grid items-center gap-16 lg:grid-cols-[1.15fr_0.85fr] lg:gap-20">
+          <div ref={leftColRef}>
+            <NameHeading
               data-cascade
-              data-heading
               className="font-display text-4xl text-white sm:text-5xl select-none"
-              style={{
-                textShadow:
-                  "0 0 20px rgba(255,255,255,0.15), 0 0 40px rgba(255,255,255,0.05)",
-              }}
             >
-              More about <span className="italic text-white/60">myself</span>
-            </h2>
+              About{" "}
+              <span className="italic" style={{ color: ACCENT_TEXT }}>
+                me
+              </span>
+            </NameHeading>
 
             <p
               data-cascade
-              className="mt-7 text-[0.95rem] leading-[1.85] text-magic-parchment/75 select-none"
-              style={{
-                textShadow: "0 0 12px rgba(255,255,255,0.06)",
-              }}
+              className="mt-8 max-w-[58ch] font-display text-2xl leading-[1.35] text-white/88 sm:text-[1.75rem] md:text-[2rem] md:leading-[1.3]"
             >
               {profile.about}
             </p>
 
-            <div data-cascade className="mt-9">
-              <ButtonCV
-                text="Get Resume"
-                isLoading={status === "downloading"}
-                status={status}
-                onClick={handleDownload}
-              />
+            <div data-cascade className="mt-10">
+              <InlineCVMenu />
             </div>
 
-            <div
+            <ul
               data-cascade
-              className="mt-10 flex flex-col gap-3 font-mono text-[0.72rem] uppercase tracking-[0.2em]"
+              className="mt-10 flex flex-col gap-3 font-sans text-[0.95rem] text-white/75"
             >
-              <div className="flex items-center gap-3 text-magic-parchment/65">
-                <span className="h-1.5 w-1.5 rounded-full bg-magic-mint shadow-[0_0_10px_var(--magic-mint)]" />
+              <li className="flex items-center gap-3">
+                <Briefcase
+                  aria-hidden
+                  className="h-4 w-4 shrink-0"
+                  style={{ color: SOFT_LAVENDER }}
+                />
                 {profile.role}
-              </div>
-              <div className="flex items-center gap-3 text-magic-parchment/65">
-                <span className="h-1.5 w-1.5 rounded-full bg-magic-gold shadow-[0_0_10px_var(--magic-gold)]" />
+              </li>
+              <li className="flex items-center gap-3">
+                <GraduationCap
+                  aria-hidden
+                  className="h-4 w-4 shrink-0"
+                  style={{ color: SOFT_BLUE }}
+                />
                 {profile.school}
-              </div>
-              <div className="flex items-center gap-3 text-magic-parchment/65">
-                <span className="h-1.5 w-1.5 rounded-full bg-magic-rose shadow-[0_0_10px_var(--magic-rose)]" />
+              </li>
+              <li className="flex items-center gap-3">
+                <MapPin
+                  aria-hidden
+                  className="h-4 w-4 shrink-0"
+                  style={{ color: "rgba(245,208,254,0.85)" }}
+                />
                 {profile.location}
-              </div>
-            </div>
+              </li>
+            </ul>
           </div>
+
+          <GlassPortrait />
         </div>
 
-        {/* Skills */}
-        <div className="mt-24">
-          <h3
-            data-heading
-            className="font-display text-3xl text-white sm:text-4xl select-none"
-            style={{
-              textShadow:
-                "0 0 20px rgba(255,255,255,0.1), 0 0 40px rgba(255,255,255,0.05)",
-            }}
-          >
-            What I work <span className="italic text-white/60">with</span>
-          </h3>
+        {/* ---------- EXPERIENCE ---------- */}
+        <section className={SECTION_GAP} id="experience" aria-label="Experience">
+          <SectionHeading
+            lead="Work"
+            accent="experience"
+            sub="Select a role to see what I did and the tools I used."
+          />
+          <div className="mt-12">
+            <ExperienceList />
+          </div>
+        </section>
 
-          <div className="relative mt-10 flex flex-col gap-6">
+        {/* ---------- SKILLS ---------- */}
+        <section className={SECTION_GAP} aria-label="Skills">
+          <SectionHeading
+            lead="Skills"
+            accent="& tools"
+            sub="What I use day to day, grouped by area."
+          />
+          <div className="mt-10 flex flex-col gap-6">
             {skillCategories.map((category, index) => (
               <SkillCategoryRow
                 key={category.title}
@@ -752,30 +1223,23 @@ export function AboutSection() {
               />
             ))}
           </div>
-        </div>
+        </section>
 
-        {/* Certifications */}
-        <div className="mt-24">
-          <h3
-            data-heading
-            className="font-display text-3xl text-white sm:text-4xl select-none"
-            style={{
-              textShadow:
-                "0 0 20px rgba(255,255,255,0.1), 0 0 40px rgba(255,255,255,0.05)",
-            }}
-          >
-            Certifications{" "}
-            <span className="italic text-white/60">& credentials</span>
-          </h3>
-
+        {/* ---------- CERTIFICATIONS ---------- */}
+        <section className={SECTION_GAP} aria-label="Certifications">
+          <SectionHeading
+            lead="Certifications"
+            accent="& credentials"
+            sub="NVIDIA-issued certificates. Select one to view the full credential."
+          />
           <div className="relative mt-10">
             <CertificationRow
-              certifications={certifications}
-              duration={45}
+              items={certifications}
+              duration={55}
               onSelect={setSelectedCertIndex}
             />
           </div>
-        </div>
+        </section>
 
         <CertificationModal
           certifications={certifications}

@@ -1,6 +1,20 @@
+/* ==========================================================================
+   PORTFOLIO DATA
+   ========================================================================== */
+
+import orangeLogo from "@/assets/exper/orange.png";
+import talanLogo from "@/assets/exper/talan.png";
+import valueLogo from "@/assets/exper/value.jpg";
+import laPosteLogo from "@/assets/exper/laposte.webp";
+import deepflowLogo from "@/assets/exper/deepflow.jpg";
+
+// Expanded-panel images (only for DeepFlow + Talan)
+import deepflowImg from "@/assets/exper/deep.jpg";
+import talanImg from "@/assets/exper/talann.jpg";
+
 export const profile = {
   name: "Maram",
-  fullName: "Maram",
+  fullName: "Maram Jebali",
   role: "AI Engineering Student",
   location: "Tunisia",
   school: "ESPRIT School of Engineering",
@@ -69,7 +83,7 @@ export type Certification = {
   issuer: string;
   issued: string;
   credentialId: string;
-  image?: string; // 👈 Added optional image field
+  image?: string;
 };
 
 export const certifications: Certification[] = [
@@ -78,43 +92,42 @@ export const certifications: Certification[] = [
     issuer: "NVIDIA",
     issued: "Mar 2026",
     credentialId: "pF329a7-SwSyOeTLS-WONQ",
-    image: "/src/assets/certificates/certif6.png", // 👈 certif1.png
+    image: "/src/assets/certificates/certif6.png",
   },
   {
     title: "Applications of AI for Anomaly Detection",
     issuer: "NVIDIA",
     issued: "Jan 2026",
     credentialId: "tsySqX7jSfWy5q22OMI6hw",
-    image: "/src/assets/certificates/certif5.png", // 👈 certif2.png
+    image: "/src/assets/certificates/certif5.png",
   },
   {
     title: "Building AI Agents with Multimodal Models",
     issuer: "NVIDIA",
     issued: "Nov 2025",
     credentialId: "F2g-DA5JToWxYr22V1Y7Tg",
-    image: "/src/assets/certificates/certif4.png", // 👈 certif3.png
+    image: "/src/assets/certificates/certif4.png",
   },
   {
     title: "Applications of AI for Predictive Maintenance",
     issuer: "NVIDIA",
     issued: "Oct 2025",
     credentialId: "38XtOjStR1qLXwTBdn0PuA",
-    image: "/src/assets/certificates/certif3.png", // 👈 certif4.png
+    image: "/src/assets/certificates/certif3.png",
   },
- 
   {
     title: "Generative AI with Diffusion Models",
     issuer: "NVIDIA",
     issued: "Feb 2025",
     credentialId: "TauXuWfURMOBYNutOVkopw",
-    image: "/src/assets/certificates/certif2.png", // 👈 certif6.png
+    image: "/src/assets/certificates/certif2.png",
   },
   {
     title: "Fundamentals of Deep Learning",
     issuer: "NVIDIA",
     issued: "Jan 2024",
     credentialId: "1tO0Ys3ITkGJkXM3sgBKrQ",
-    image: "/src/assets/certificates/certif1.png", // 👈 certif7.png
+    image: "/src/assets/certificates/certif1.png",
   },
 ];
 
@@ -428,4 +441,125 @@ export const categoryOrder: ProjectCategory[] = [
   "academic",
   "hackathon",
   "club",
+];
+
+/* ==========================================================================
+   EXPERIENCE
+   ========================================================================== */
+
+export type Experience = {
+  role: string;
+  company: string;
+  period: string;
+  location?: string;
+  type?: string;
+  desc: string;
+  bullets?: string[];
+  tech: string[];
+  logo: string;
+  /** Optional image shown when the item is expanded */
+  image?: string;
+  current?: boolean;
+  link?: string;
+};
+
+export const experiences: Experience[] = [
+  {
+    role: "Teacher Assistant & Mentor",
+    company: "DeepFlow",
+    period: "Sep 2025 — Present",
+    location: "Ariana, Tunisia · Hybrid",
+    type: "Part-time",
+    current: true,
+    desc: "Hosting and assisting workshops and technical sessions about AI, ML and DL for university students.",
+    bullets: [
+      "Lead hands-on sessions on Machine Learning and Deep Learning concepts for engineering students.",
+      "Mentor members through their AI learning journey, from fundamentals to applied projects.",
+    ],
+    tech: ["AI", "Machine Learning", "Deep Learning", "Mentoring", "Teaching"],
+    logo: deepflowLogo,
+    image: deepflowImg,
+  },
+  {
+    role: "AI Engineering Intern",
+    company: "Orange Tunisie",
+    period: "Aug 2026 — Sep 2026 · 2 mos",
+    location: "Tunisia · On-site",
+    type: "Internship",
+    desc: "Built Oli, an intelligent conversational assistant for Orange Tunisie powered by a Retrieval-Augmented Generation pipeline.",
+    bullets: [
+      "Designed a TypeScript RAG module querying Qdrant Cloud directly — no intermediate backend, no Python dependency.",
+      "Indexed ~357 Orange Tunisia documents and used Qdrant Cloud Inference for server-side embeddings.",
+      "Integrated Next.js 15 + Vercel AI SDK for real-time SSE chat streaming, with source citations on every answer.",
+      "Persisted chats, messages and votes with Neon PostgreSQL + Drizzle ORM, and authenticated users via Auth.js.",
+      "Backed by Gemini, Groq and Mistral LLMs — answers are always grounded in official documents.",
+    ],
+    tech: [
+      "Next.js",
+      "TypeScript",
+      "RAG",
+      "Qdrant",
+      "Vercel AI SDK",
+      "PostgreSQL",
+      "Drizzle",
+      "Auth.js",
+      "Gemini",
+      "Groq",
+      "Mistral",
+    ],
+    logo: orangeLogo,
+    // no image — text-only expanded panel
+  },
+  {
+    role: "AI Engineering Intern",
+    company: "Talan",
+    period: "Jul 2026 — Aug 2026 · 2 mos",
+    location: "France · On-site",
+    type: "Internship",
+    desc: "Summer Camp 2026 — “Beyond the Prompt: Mistral à l'épreuve des usages institutionnels.” Selected among 120 students from international engineering and business schools.",
+    bullets: [
+      "Designed UrbanTwin, a French-language urban planning assistant: describe a project, draw the parcel on a map, and the platform analyses it against official public sources.",
+      "Extracted applicable urbanism rules with verifiable citations, then orchestrated AI agents to assist the design phase.",
+      "Built on Mistral AI technologies with a focus on institutional impact, relevance of usage and created value.",
+    ],
+    tech: ["Mistral AI", "AI Agents", "RAG", "Urban Planning"],
+    logo: talanLogo,
+    image: talanImg,
+  },
+  {
+    role: "AI Intern",
+    company: "Value",
+    period: "Jun 2025 — Jul 2025 · 2 mos",
+    location: "Tunisia · Hybrid",
+    type: "Internship",
+    desc: "Text Evaluation & Image Relevance System.",
+    bullets: [
+      "Designed a global radar metric using polygon mathematical modeling combined with NLP to detect low-quality texts.",
+      "Built an autonomous LLM workflow for image–text relevance with automatic image retrieval and integration.",
+      "Integrated the Groq API for real-time LLM inference and automated decision-making.",
+    ],
+    tech: [
+      "Python",
+      "NLP",
+      "LLM",
+      "Groq API",
+      "LangChain",
+      "Transformers",
+      "NumPy",
+      "Matplotlib",
+    ],
+    logo: valueLogo,
+    // no image
+  },
+  {
+    role: "Summer Intern",
+    company: "La Poste Tunisienne",
+    period: "Jun 2023 — Jul 2023 · 2 mos",
+    location: "Tunis, Tunisia · Hybrid",
+    type: "Internship",
+    desc: "Supported daily operations of the Hybrid Courier Department, improving document tracking efficiency and streamlining postal workflows.",
+    tech: ["Operations", "Logistics", "Process Optimization"],
+    logo: laPosteLogo,
+    // no image
+  },
 ];
