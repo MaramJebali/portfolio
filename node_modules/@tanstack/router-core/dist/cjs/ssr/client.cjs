@@ -1,0 +1,15 @@
+Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+const require_load_client = require("../load-client.cjs");
+const require_makeSerovalPlugin = require("./serializer/makeSerovalPlugin.cjs");
+const require_headers = require("./headers.cjs");
+const require_json = require("./json.cjs");
+const require_seroval_plugins = require("./serializer/seroval-plugins.cjs");
+const require_RawStreamRPCPlugin = require("./serializer/RawStreamRPCPlugin.cjs");
+exports.createDefaultSerovalPlugins = require_seroval_plugins.createDefaultSerovalPlugins;
+exports.createRawStreamDeserializePlugin = require_RawStreamRPCPlugin.createRawStreamDeserializePlugin;
+exports.defaultSerovalDeserializerPlugins = require_seroval_plugins.defaultSerovalDeserializerPlugins;
+exports.defaultSerovalPlugins = require_seroval_plugins.defaultSerovalPlugins;
+exports.hydrate = require_load_client.hydrate;
+exports.json = require_json.json;
+exports.makeSerovalPlugin = require_makeSerovalPlugin.makeSerovalPlugin;
+exports.mergeHeaders = require_headers.mergeHeaders;
