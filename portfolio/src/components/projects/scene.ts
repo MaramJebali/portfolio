@@ -73,10 +73,31 @@ export function mountScene(
   /* full-list rows (pidx) */
   pidx.innerHTML = '<div class="lab">All projects · click any row</div>' +
     projects.map((p, i) =>
-      `<a class="pn2" href="#p-${p.slug}"><span class="lab">${pad(i)}</span>
+      `<a class="pn2" data-cat="${p.category}" href="#p-${p.slug}"><span class="lab">${pad(i)}</span>
         <span class="d nm">${p.title}</span>
         <span class="pd2"><span>${p.tagline}</span><span class="chips">${p.tags.slice(0, 4).map(chip).join("")}</span></span>
         <span class="d ar2">→</span></a>`).join("");
+
+  /* category filter above the full list */
+  let fCat = "all";
+  const pfx = document.createElement("div");
+  pfx.className = "pfx";
+  const cats = ["all", ...Array.from(new Set(projects.map(p => p.category)))];
+  pfx.innerHTML = cats.map(c =>
+    `<button type="button" class="pf${c === "all" ? " on" : ""}" data-f="${c}">${c === "all" ? "All" : c}</button>`).join("");
+  pidx.prepend(pfx);
+  const rows = Array.from(pidx.querySelectorAll<HTMLElement>(".pn2"));
+  const applyFilter = () => {
+    rows.forEach(r => { r.hidden = !(fCat === "all" || r.dataset.cat === fCat); });
+    pfx.querySelectorAll("button").forEach(b =>
+      b.classList.toggle("on", (b as HTMLElement).dataset.f === fCat));
+  };
+  pfx.addEventListener("click", ev => {
+    const b = (ev.target as HTMLElement).closest?.("button") as HTMLElement | null;
+    if (!b) return;
+    fCat = b.dataset.f ?? "all";
+    applyFilter();
+  });
 
   /* rim/prism + glow layers (main.js@109940) */
   fw1.insertAdjacentHTML("afterbegin", '<div class="fglow"></div>');
