@@ -36,11 +36,6 @@ export function ProjectsScene() {
   return (
     <div className="pjs-root relative z-10" ref={rootRef}>
       <section id="projects" data-r>
-        <div className="eb lab">
-          Projects
-          <a href="#pidx" style={{ marginLeft: "auto" }}>Skip to full list ↓</a>
-        </div>
-
         <div className="trk" id="trk">
           <div className="stg" id="stg">
             <div className="glw" id="glw"></div>

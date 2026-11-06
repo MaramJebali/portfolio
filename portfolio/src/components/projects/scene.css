@@ -16,3 +16,11 @@
 .pjs-root .fp{background:rgba(139,92,246,.32);border:1.2px solid rgba(255,255,255,.35);color:#fff;-webkit-backdrop-filter:blur(12px) saturate(1.4);backdrop-filter:blur(12px) saturate(1.4)}
 .pjs-root .pf.on{background:rgba(139,92,246,.32);border-color:rgba(255,255,255,.4);color:#fff;-webkit-backdrop-filter:blur(10px) saturate(1.3);backdrop-filter:blur(10px) saturate(1.3);box-shadow:0 8px 24px -8px rgba(139,92,246,.55)}
 .pjs-root #projects h2.hd .w:last-child i{color:#a78bfa}
+/* flush deck start: no eyebrow band, stage pinned from the very top */
+.pjs-root #projects{padding-top:0}
+.pjs-root #projects:before{top:0;bottom:0}
+.pjs-root .trk{margin-top:0}
+@media (max-width:900px){.pjs-root #projects{padding-top:0}}
+/* the violet card is fully opaque — never shows the scene background through it */
+.pjs-root .dk.v1{--card:none;background:linear-gradient(170deg,#8b5cf6,#6728b8 60%,#5b21b6);-webkit-backdrop-filter:none;backdrop-filter:none}
+.pjs-root .dk.v1 .plg{background:#f2f2f2;color:#00020f;border-color:rgba(0,2,15,.4)}
