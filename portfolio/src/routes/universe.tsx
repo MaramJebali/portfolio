@@ -1,13 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Navbar, type SectionKey } from "@/components/portfolio/Navbar";
-import { StarField } from "@/components/portfolio/StarField";
+import { FinaleBackground } from "@/components/portfolio/FinaleBackground";
 import { ProjectModal } from "@/components/portfolio/ProjectModal";
 import { UniverseSection } from "@/components/portfolio/sections/UniverseSection";
 import { AboutSection } from "@/components/portfolio/sections/AboutSection";
-import { WorksSection } from "@/components/portfolio/sections/WorksSection";
 import { ContactSection } from "@/components/portfolio/sections/ContactSection";
+import { ProjectsScene } from "@/components/projects/ProjectsScene";
 import type { Project } from "@/data/portfolio";
 
 export const Route = createFileRoute("/universe")({
@@ -34,6 +34,11 @@ function Universe() {
   const [active, setActive] = useState<SectionKey>("universe");
   const [project, setProject] = useState<Project | null>(null);
 
+  /* deep links like /universe#p-overdose open straight onto the projects scene */
+  useEffect(() => {
+    if (/^#p-[\w-]+$/.test(location.hash)) setActive("works");
+  }, []);
+
   const handleChange = (key: SectionKey) => {
     setActive(key);
     if (typeof window !== "undefined")
@@ -41,9 +46,9 @@ function Universe() {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-background">
+    <div className="relative min-h-screen overflow-x-clip bg-background">
       <div className="pointer-events-none fixed inset-0">
-        <StarField />
+        <FinaleBackground />
         <div className="absolute inset-x-0 bottom-0 h-[55vh] bg-spotlight opacity-60" />
         <div className="absolute -left-40 top-1/4 h-96 w-96 rounded-full bg-accent/10 blur-[120px]" />
         <div className="absolute -right-40 top-1/2 h-96 w-96 rounded-full bg-primary/10 blur-[120px]" />
@@ -51,29 +56,32 @@ function Universe() {
 
       <Navbar active={active} onChange={handleChange} />
 
-      <main className="relative z-10 pt-16">
-        <AnimatePresence mode="wait">
-          <motion.section
-            key={active}
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -18 }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
-          >
-            {active === "universe" && (
-              <UniverseSection
-                onNavigate={handleChange}
-                onOpenProject={setProject}
-              />
-            )}
-            {active === "about" && <AboutSection />}
-            {active === "works" && (
-              <WorksSection onOpenProject={setProject} />
-            )}
-            {active === "contact" && <ContactSection />}
-          </motion.section>
-        </AnimatePresence>
-      </main>
+      {/* Work — the deck scene owns its own scroll space, so it renders outside
+          the motion.section (transform animations would break its fixed overlay) */}
+      {active === "works" && <ProjectsScene />}
+
+      {active !== "works" && (
+        <main className="relative z-10 pt-16">
+          <AnimatePresence mode="wait">
+            <motion.section
+              key={active}
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -18 }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+            >
+              {active === "universe" && (
+                <UniverseSection
+                  onNavigate={handleChange}
+                  onOpenProject={setProject}
+                />
+              )}
+              {active === "about" && <AboutSection />}
+              {active === "contact" && <ContactSection />}
+            </motion.section>
+          </AnimatePresence>
+        </main>
+      )}
 
       <ProjectModal project={project} onClose={() => setProject(null)} />
     </div>
