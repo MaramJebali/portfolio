@@ -344,7 +344,7 @@ html.lenis body {
   border-radius: 0 0.875rem 0.875rem;
   border: 1px solid rgba(167, 139, 250, 0.18);
   background: var(--sk-bg);
-  transform: perspective(56.25rem) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(var(--ty, 0rem));
+  transform: perspective(56.25rem) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(var(--ty, 0rem)) skewY(calc(var(--sk, 0) * 1deg)) scaleY(calc(1 + var(--sc, 0)));
   transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.6s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: transform;
 }

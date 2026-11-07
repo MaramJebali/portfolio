@@ -63,6 +63,12 @@ import {
   SiOllama,
   SiPandas,
   SiNumpy,
+  SiGithubactions,
+  SiGitlab,
+  SiJenkins,
+  SiHtml5,
+  SiCss,
+  SiApachehadoop,
   SiDjango,
   SiReact,
   SiStreamlit,
@@ -187,6 +193,10 @@ const skillIcons: Record<string, { Icon: IconType; color: string }> = {
   Docker: { Icon: SiDocker, color: "#2496ED" },
   MLOps: { Icon: BrainCircuit, color: "#A78BFA" },
   DevOps: { Icon: LucideInfinity, color: "#7DD3FC" },
+  "GitHub Actions": { Icon: SiGithubactions, color: "#2088FF" },
+  "GitLab CI": { Icon: SiGitlab, color: "#FC6D26" },
+  Jenkins: { Icon: SiJenkins, color: "#D33833" },
+  Hadoop: { Icon: SiApachehadoop, color: "#FFC107" },
   Vercel: { Icon: SiVercel, color: "#FFFFFF" },
   Render: { Icon: SiRender, color: "#8B78F6" },
   /* backend */
@@ -199,6 +209,8 @@ const skillIcons: Record<string, { Icon: IconType; color: string }> = {
   React: { Icon: SiReact, color: "#61DAFB" },
   "Next.js": { Icon: SiNextdotjs, color: "#FFFFFF" },
   "Tailwind CSS": { Icon: SiTailwindcss, color: "#38BDF8" },
+  HTML: { Icon: SiHtml5, color: "#E34F26" },
+  CSS: { Icon: SiCss, color: "#1572B6" },
   Figma: { Icon: SiFigma, color: "#F24E1E" },
   Streamlit: { Icon: SiStreamlit, color: "#FF4B4B" },
   Unity: { Icon: SiUnity, color: "#FFFFFF" },
@@ -209,7 +221,6 @@ const skillIcons: Record<string, { Icon: IconType; color: string }> = {
   "After Effects": { Icon: Film, color: "#8B8BF5" },
   "Premiere Pro": { Icon: Video, color: "#B58CF6" },
   InDesign: { Icon: BookOpen, color: "#FF3366" },
-  Lightroom: { Icon: Camera, color: "#A0D9F0" },
 };
 
 const skillCategories = [
@@ -223,6 +234,7 @@ const skillCategories = [
       "PostgreSQL",
       "MongoDB",
       "Neo4j",
+      "Hadoop",
       "ChromaDB",
       "Qdrant",
       "Power BI",
@@ -266,12 +278,18 @@ const skillCategories = [
     items: ["AWS", "Docker", "MLOps", "DevOps", "Vercel", "Render"],
   },
   {
+    title: "GitOps & CI/CD",
+    items: ["GitHub Actions", "GitLab CI", "Jenkins"],
+  },
+  {
     title: "Backend",
     items: ["FastAPI", "Django", "Celery", "REST APIs", "Git"],
   },
   {
     title: "Frontend & design",
     items: [
+      "HTML",
+      "CSS",
       "React",
       "Next.js",
       "Tailwind CSS",
@@ -282,14 +300,13 @@ const skillCategories = [
     ],
   },
   {
-    title: "Design & Adobe",
+    title: "Design & Montage",
     items: [
       "Photoshop",
       "Illustrator",
       "After Effects",
       "Premiere Pro",
       "InDesign",
-      "Lightroom",
     ],
   },
 ];
@@ -411,6 +428,52 @@ function SkillFolder({
       </div>
     </div>
   );
+}
+
+
+/* ---------- Scroll velocity skew — Farah's section sway (main@94860) ---------- */
+/* c = clamp(dv*-.06, -1.6, 1.6); sv = (sv+(c-sk)*.08)*.82; sk += sv      */
+function SkillScrollSway({
+  containerRef,
+}: {
+  containerRef: RefObject<HTMLDivElement | null>;
+}) {
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const el = containerRef.current;
+    if (!el) return;
+    let raf = 0;
+    let last = window.scrollY;
+    let sk = 0;
+    let sv = 0;
+
+    const loop = () => {
+      const sy = window.scrollY;
+      const dv = sy - last;
+      last = sy;
+      if (window.innerWidth >= 900) {
+        const c = Math.max(-1.6, Math.min(1.6, dv * -0.06));
+        sv = (sv + (c - sk) * 0.08) * 0.82;
+        sk += sv;
+        el.style.setProperty("--sk", sk.toFixed(3));
+        el.style.setProperty("--sc", (Math.abs(sk) * 0.006).toFixed(4));
+      } else if (sk !== 0) {
+        sk = 0;
+        sv = 0;
+        el.style.setProperty("--sk", "0");
+        el.style.setProperty("--sc", "0");
+      }
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+    return () => {
+      cancelAnimationFrame(raf);
+      el.style.removeProperty("--sk");
+      el.style.removeProperty("--sc");
+    };
+  }, [containerRef]);
+
+  return null;
 }
 
 /* ---------- Crosshair cursor + live coordinates (scoped to the toolbox) ---------- */
@@ -1360,6 +1423,7 @@ export function AboutSection({
               </div>
             ))}
             <SkillCrosshair containerRef={skillsRef} />
+            <SkillScrollSway containerRef={skillsRef} />
           </div>
         </section>
 
