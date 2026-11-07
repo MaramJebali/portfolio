@@ -32,8 +32,9 @@ const TEXT_FAINT = "rgba(255,255,255,0.55)";
 
 const GLASS_TINT =
   "linear-gradient(115deg, rgba(245,208,254,0.16) 0%, rgba(255,255,255,0.04) 30%, rgba(219,234,254,0.12) 62%, rgba(167,139,250,0.20) 100%)";
-/* the vivid violet of the projects folder deck in the Work section */
-const FOLDER_VIOLET = "linear-gradient(170deg, #8b5cf6 0%, #6728b8 60%, #5b21b6 100%)";
+/* the dark glass of the original capsule */
+const GLASS_BASE_PILL =
+  "linear-gradient(180deg, rgba(10,6,32,0.88) 0%, rgba(18,10,48,0.80) 100%)";
 const GLASS_BASE_PANEL =
   "linear-gradient(180deg, rgba(12,6,40,0.92) 0%, rgba(24,12,66,0.88) 100%)";
 
@@ -122,12 +123,12 @@ export function Navbar({
       <div>
         <nav
           aria-label="Primary"
-          className="pointer-events-auto relative flex items-center rounded-full border py-2 pl-3 pr-2 sm:py-2.5"
+          className="pointer-events-auto relative flex items-center rounded-full border py-2 pl-3 pr-2 backdrop-blur-2xl sm:py-2.5"
           style={{
-            backgroundImage: FOLDER_VIOLET,
-            borderColor: "rgba(255,255,255,0.35)",
+            backgroundImage: GLASS_BASE_PILL,
+            borderColor: "rgba(167,139,250,0.38)",
             boxShadow:
-              "0 0 28px -6px rgba(139,92,246,0.65), 0 20px 50px -22px rgba(31,10,80,0.75), inset 0 1px 0 rgba(255,255,255,0.28)",
+              "0 0 26px -4px rgba(167,139,250,0.5), 0 18px 45px -20px rgba(0,0,0,0.65), inset 0 1px 0 rgba(255,255,255,0.14)",
           }}
         >
           {/* desktop links */}
@@ -151,7 +152,7 @@ export function Navbar({
                 aria-haspopup="menu"
                 aria-expanded={cvOpen}
                 className={cn(
-                  "flex items-center gap-1.5 rounded-full border border-white/40 bg-white/[0.16] font-mono text-[0.68rem] uppercase tracking-[0.22em] transition-colors duration-300 hover:bg-white/[0.28]",
+                  "flex items-center gap-1.5 rounded-full border border-white/25 bg-white/[0.07] font-mono text-[0.68rem] uppercase tracking-[0.22em] transition-colors duration-300 hover:bg-white/[0.16]",
                   "px-3.5 py-1.5",
                   FOCUS_RING
                 )}
