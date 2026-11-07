@@ -1,9 +1,11 @@
 // src/components/portfolio/Navbar.tsx
 //
-// Glass pill. Section links are plain text; the CV is the one emphasised
-// action (a small outlined pill) because it is what a recruiter came for.
+// Active Theory-style nav: a dark glass capsule pinned to the top-right only
+// (never full-width). Uppercase, wide-tracked links separated by glowing
+// rules; CV is the single emphasised action. It dives out when you scroll
+// down and springs back the moment you scroll up.
 
-import { ChevronDown, Download, Menu, X } from "lucide-react";
+import { ChevronDown, Menu, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/lib/utils";
@@ -25,20 +27,35 @@ const CV_OPTIONS = [
   { lang: "fr", label: "Français", flag: "🇫🇷", href: "/cv-fr.pdf", file: "Maram_Achraf_CV_FR.pdf" },
 ] as const;
 
-// Text tones — all pass 4.5:1 on the dark glass.
+// Text tones — pass 4.5:1 on the dark capsule.
 const TEXT_BRIGHT = "#ffffff";
-const TEXT_SOFT = "rgba(255,255,255,0.78)";
-const TEXT_FAINT = "rgba(255,255,255,0.62)";
+const TEXT_SOFT = "rgba(255,255,255,0.72)";
+const TEXT_FAINT = "rgba(255,255,255,0.55)";
 
 const GLASS_TINT =
-  "linear-gradient(115deg, rgba(245,208,254,0.22) 0%, rgba(255,255,255,0.06) 30%, rgba(219,234,254,0.20) 62%, rgba(167,139,250,0.26) 100%)";
+  "linear-gradient(115deg, rgba(245,208,254,0.16) 0%, rgba(255,255,255,0.04) 30%, rgba(219,234,254,0.12) 62%, rgba(167,139,250,0.20) 100%)";
 const GLASS_BASE_PILL =
-  "linear-gradient(180deg, rgba(12,6,40,0.62) 0%, rgba(24,12,66,0.52) 100%)";
+  "linear-gradient(180deg, rgba(10,6,32,0.88) 0%, rgba(18,10,48,0.80) 100%)";
 const GLASS_BASE_PANEL =
-  "linear-gradient(180deg, rgba(12,6,40,0.86) 0%, rgba(24,12,66,0.80) 100%)";
+  "linear-gradient(180deg, rgba(12,6,40,0.92) 0%, rgba(24,12,66,0.88) 100%)";
 
 const FOCUS_RING =
   "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#c084fc]";
+
+/* glowing rule between links, like the reference divider */
+function Rule() {
+  return (
+    <span
+      aria-hidden
+      className="mx-1 h-px w-6 shrink-0 sm:w-8"
+      style={{
+        background:
+          "linear-gradient(90deg, rgba(255,255,255,0.05), rgba(167,139,250,0.85), rgba(255,255,255,0.05))",
+        boxShadow: "0 0 8px 1px rgba(167,139,250,0.55)",
+      }}
+    />
+  );
+}
 
 export function Navbar({
   active,
@@ -48,21 +65,32 @@ export function Navbar({
   onChange: (key: SectionKey) => void;
 }) {
   const [open, setOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
   const [cvOpen, setCvOpen] = useState(false);
+  const [dived, setDived] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
   const cvRef = useRef<HTMLDivElement>(null);
+  const lastY = useRef(0);
 
+  /* dive on scroll-down, resurface on scroll-up */
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
+    const onScroll = () => {
+      const y = window.scrollY;
+      const goingDown = y > lastY.current + 2;
+      const goingUp = y < lastY.current - 2;
+      if (goingDown && y > 80) setDived(true);
+      else if (goingUp || y <= 80) setDived(false);
+      lastY.current = y;
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Desktop CV dropdown: close on outside click / Escape
+  /* pause the dive while the CV menu / mobile menu is open */
   useEffect(() => {
     if (!cvOpen) return;
+    const reset = () => setDived(false);
+    reset();
     const onClick = (e: MouseEvent) => {
       if (cvRef.current && !cvRef.current.contains(e.target as Node))
         setCvOpen(false);
@@ -78,7 +106,6 @@ export function Navbar({
     };
   }, [cvOpen]);
 
-  // Mobile menu: close on outside click / Escape
   useEffect(() => {
     if (!open) return;
     const onClick = (e: MouseEvent) => {
@@ -96,6 +123,12 @@ export function Navbar({
     };
   }, [open]);
 
+  useEffect(() => {
+    if (!open) return;
+    const reset = () => setDived(false);
+    reset();
+  }, [open]);
+
   const downloadCV = (opt: (typeof CV_OPTIONS)[number]) => {
     const link = document.createElement("a");
     link.href = opt.href;
@@ -110,107 +143,87 @@ export function Navbar({
   return (
     <header
       ref={headerRef}
-      className="pointer-events-none fixed inset-x-0 top-0 z-50"
+      className="pointer-events-none fixed right-0 top-0 z-50 flex justify-end pr-4 pt-4 sm:pr-6 sm:pt-5"
     >
-      <div
-        className={cn(
-          "flex justify-center px-4 transition-[padding] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
-          scrolled ? "pt-3 sm:pt-4" : "pt-4 sm:pt-6"
-        )}
+      {/* the capsule itself dives; the header stays put */}
+      <motion.div
+        animate={{ y: dived ? "-130%" : "0%" }}
+        transition={{ type: "spring", stiffness: 210, damping: 26 }}
       >
         <nav
           aria-label="Primary"
-          className={cn(
-            "pointer-events-auto relative flex w-full items-center justify-between",
-            "rounded-full border border-white/20 backdrop-blur-2xl",
-            "transition-[max-width,padding,box-shadow] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
-            scrolled
-              ? "max-w-4xl px-3 py-2.5 sm:px-4"
-              : "max-w-6xl px-3 py-3 sm:px-4 sm:py-3.5"
-          )}
+          className="pointer-events-auto relative flex items-center rounded-full border py-2 pl-2.5 pr-2 backdrop-blur-2xl sm:py-2.5 sm:pl-3"
           style={{
             backgroundImage: [GLASS_TINT, GLASS_BASE_PILL].join(", "),
-            boxShadow: scrolled
-              ? "0 18px 45px -22px rgba(167,139,250,0.55), 0 1px 0 rgba(255,255,255,0.22) inset"
-              : "0 24px 60px -28px rgba(167,139,250,0.5), 0 1px 0 rgba(255,255,255,0.25) inset",
+            borderColor: "rgba(167,139,250,0.38)",
+            boxShadow:
+              "0 0 26px -4px rgba(167,139,250,0.5), 0 18px 45px -20px rgba(0,0,0,0.65), inset 0 1px 0 rgba(255,255,255,0.14)",
           }}
         >
-          {/* ---------- LEFT: avatar + name (identity is visible at a glance) ---------- */}
+          {/* tiny brand dot — back to top */}
           <button
             type="button"
             onClick={() => onChange("universe")}
             aria-label={`${profile.name} — back to top`}
-            className={cn("group flex shrink-0 items-center gap-3 rounded-full", FOCUS_RING)}
+            className="group mr-1 grid h-8 w-8 shrink-0 place-items-center overflow-hidden rounded-full ring-1 ring-white/25 transition-transform duration-300 hover:scale-105"
+            style={{ background: "#1a0b3d" }}
           >
-            <span
-              className={cn(
-                "relative grid place-items-center overflow-hidden rounded-full ring-1 ring-white/25 transition-all duration-500",
-                scrolled ? "h-9 w-9" : "h-10 w-10"
-              )}
-              style={{ background: "#1a0b3d" }}
-            >
-              <img
-                src={profileImage}
-                alt=""
-                width={40}
-                height={40}
-                className="h-full w-full object-cover"
-                draggable={false}
-                onError={(e) => {
-                  const img = e.target as HTMLImageElement;
-                  img.style.display = "none";
-                  const parent = img.parentElement;
-                  if (parent && !parent.dataset.fallback) {
-                    parent.dataset.fallback = "1";
-                    const span = document.createElement("span");
-                    span.textContent = profile.name.charAt(0);
-                    span.style.color = "#ffffff";
-                    span.style.fontSize = "0.85rem";
-                    span.style.fontWeight = "500";
-                    parent.appendChild(span);
-                  }
-                }}
-              />
-            </span>
-            <span
-              className="hidden pr-1 font-sans text-[0.9rem] font-medium tracking-[-0.005em] sm:block"
-              style={{ color: TEXT_BRIGHT }}
-            >
-              {profile.name}
-            </span>
+            <img
+              src={profileImage}
+              alt=""
+              width={32}
+              height={32}
+              className="h-full w-full object-cover"
+              draggable={false}
+              onError={(e) => {
+                const img = e.target as HTMLImageElement;
+                img.style.display = "none";
+                const parent = img.parentElement;
+                if (parent && !parent.dataset.fallback) {
+                  parent.dataset.fallback = "1";
+                  const span = document.createElement("span");
+                  span.textContent = profile.name.charAt(0);
+                  span.style.color = "#ffffff";
+                  span.style.fontSize = "0.75rem";
+                  span.style.fontWeight = "500";
+                  parent.appendChild(span);
+                }
+              }}
+            />
           </button>
 
-          {/* ---------- RIGHT: section links + CV ---------- */}
-          <div className="hidden flex-1 items-center justify-end gap-1 pl-3 md:flex">
-            {NAV_ITEMS.map((item) => (
-              <NavLink
-                key={item.key}
-                label={item.label}
-                isActive={active === item.key}
-                onClick={() => onChange(item.key)}
-                compact={scrolled}
-              />
+          {/* desktop links */}
+          <div className="hidden items-center md:flex">
+            {NAV_ITEMS.map((item, i) => (
+              <div key={item.key} className="flex items-center">
+                {i > 0 && <Rule />}
+                <NavLink
+                  label={item.label}
+                  isActive={active === item.key}
+                  onClick={() => onChange(item.key)}
+                />
+              </div>
             ))}
+            <Rule />
 
             {/* CV — the single emphasised action */}
-            <div ref={cvRef} className="relative ml-2">
+            <div ref={cvRef} className="relative ml-1">
               <button
                 type="button"
                 onClick={() => setCvOpen((v) => !v)}
                 aria-haspopup="menu"
                 aria-expanded={cvOpen}
                 className={cn(
-                  "flex items-center gap-2 rounded-full border border-white/30 bg-white/[0.08] font-sans font-medium transition-colors duration-300 hover:bg-white/[0.16]",
-                  scrolled ? "px-3.5 py-1.5 text-[0.85rem]" : "px-4 py-2 text-[0.88rem]",
+                  "flex items-center gap-1.5 rounded-full border border-white/25 bg-white/[0.07] font-mono text-[0.68rem] uppercase tracking-[0.22em] transition-colors duration-300 hover:bg-white/[0.16]",
+                  "px-3.5 py-1.5",
                   FOCUS_RING
                 )}
                 style={{ color: TEXT_BRIGHT }}
               >
-                <Download className="h-3.5 w-3.5" strokeWidth={2} />
                 <span>CV</span>
                 <ChevronDown
                   className={cn(
-                    "h-3.5 w-3.5 transition-transform duration-300",
+                    "h-3 w-3 transition-transform duration-300",
                     cvOpen && "rotate-180"
                   )}
                   strokeWidth={2}
@@ -257,7 +270,7 @@ export function Navbar({
             </div>
           </div>
 
-          {/* ---------- Mobile toggle ---------- */}
+          {/* mobile toggle */}
           <div className="flex md:hidden">
             <button
               type="button"
@@ -265,11 +278,9 @@ export function Navbar({
               aria-label={open ? "Close menu" : "Open menu"}
               aria-expanded={open}
               className={cn(
-                "grid place-items-center rounded-full ring-1 ring-white/25 transition-colors hover:bg-white/[0.08]",
-                scrolled ? "h-10 w-10" : "h-11 w-11",
+                "grid h-9 w-9 place-items-center rounded-full text-white/90 ring-1 ring-white/25 transition-colors hover:bg-white/[0.08]",
                 FOCUS_RING
               )}
-              style={{ color: TEXT_BRIGHT }}
             >
               {open ? (
                 <X className="h-4 w-4" strokeWidth={2} />
@@ -279,9 +290,9 @@ export function Navbar({
             </button>
           </div>
         </nav>
-      </div>
+      </motion.div>
 
-      {/* ---------- Mobile menu — same glass ---------- */}
+      {/* mobile menu — anchored right, same glass */}
       <AnimatePresence>
         {open && (
           <motion.div
@@ -289,7 +300,7 @@ export function Navbar({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-            className="pointer-events-auto mx-auto mt-2 w-[calc(100vw-2rem)] max-w-md overflow-hidden rounded-2xl border border-white/20 backdrop-blur-2xl md:hidden"
+            className="pointer-events-auto absolute right-4 top-full mt-2 w-[min(20rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-white/20 backdrop-blur-2xl md:hidden"
             style={{
               backgroundImage: [GLASS_TINT, GLASS_BASE_PANEL].join(", "),
               boxShadow:
@@ -307,7 +318,7 @@ export function Navbar({
                     setOpen(false);
                   }}
                   className={cn(
-                    "py-3.5 text-left font-sans text-[1rem] font-medium transition-colors",
+                    "py-3.5 text-left font-mono text-[0.8rem] uppercase tracking-[0.24em] transition-colors",
                     FOCUS_RING
                   )}
                   style={{
@@ -349,16 +360,15 @@ export function Navbar({
   );
 }
 
+/* uppercase, wide-tracked, reference-style link */
 function NavLink({
   label,
   isActive,
   onClick,
-  compact,
 }: {
   label: string;
   isActive: boolean;
   onClick: () => void;
-  compact: boolean;
 }) {
   return (
     <button
@@ -366,18 +376,23 @@ function NavLink({
       onClick={onClick}
       aria-current={isActive ? "page" : undefined}
       className={cn(
-        "relative flex items-center gap-1.5 rounded-full font-sans font-medium tracking-[-0.005em] transition-colors duration-300 hover:text-white",
-        compact ? "px-3.5 py-1.5 text-[0.85rem]" : "px-4 py-2 text-[0.88rem]",
+        "relative rounded-full px-3 py-1.5 font-mono text-[0.68rem] uppercase tracking-[0.24em] transition-colors duration-300 sm:px-4",
         FOCUS_RING
       )}
-      style={{ color: isActive ? TEXT_BRIGHT : TEXT_SOFT }}
+      style={{
+        color: isActive ? TEXT_BRIGHT : TEXT_SOFT,
+        textShadow: isActive ? "0 0 12px rgba(167,139,250,0.75)" : undefined,
+      }}
     >
-      <span>{label}</span>
+      {label}
       {isActive && (
         <motion.span
           layoutId="nav-underline"
-          className="absolute inset-x-4 -bottom-0.5 h-px"
-          style={{ background: "#c084fc" }}
+          className="pointer-events-none absolute inset-x-3 -bottom-0 h-px"
+          style={{
+            background: "#c084fc",
+            boxShadow: "0 0 8px 1px rgba(192,132,252,0.8)",
+          }}
         />
       )}
     </button>
