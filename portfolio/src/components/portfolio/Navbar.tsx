@@ -1,16 +1,14 @@
 // src/components/portfolio/Navbar.tsx
 //
-// Active Theory-style nav: a dark glass capsule pinned to the top-right only
-// (never full-width). Uppercase, wide-tracked links separated by glowing
-// rules; CV is the single emphasised action. It dives out when you scroll
-// down and springs back the moment you scroll up.
+// Active Theory-style nav: a capsule pinned to the top-right only (never
+// full-width), wearing the same vivid violet as the projects folder deck.
+// Uppercase, wide-tracked links separated by glowing rules; CV is the single
+// emphasised action. It stays fixed at its position while scrolling.
 
 import { ChevronDown, Menu, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/lib/utils";
-import { profile } from "@/data/portfolio";
-import profileImage from "@/assets/profile.jpg";
 
 export type SectionKey = "universe" | "about" | "works" | "contact";
 
@@ -34,8 +32,8 @@ const TEXT_FAINT = "rgba(255,255,255,0.55)";
 
 const GLASS_TINT =
   "linear-gradient(115deg, rgba(245,208,254,0.16) 0%, rgba(255,255,255,0.04) 30%, rgba(219,234,254,0.12) 62%, rgba(167,139,250,0.20) 100%)";
-const GLASS_BASE_PILL =
-  "linear-gradient(180deg, rgba(10,6,32,0.88) 0%, rgba(18,10,48,0.80) 100%)";
+/* the vivid violet of the projects folder deck in the Work section */
+const FOLDER_VIOLET = "linear-gradient(170deg, #8b5cf6 0%, #6728b8 60%, #5b21b6 100%)";
 const GLASS_BASE_PANEL =
   "linear-gradient(180deg, rgba(12,6,40,0.92) 0%, rgba(24,12,66,0.88) 100%)";
 
@@ -66,31 +64,12 @@ export function Navbar({
 }) {
   const [open, setOpen] = useState(false);
   const [cvOpen, setCvOpen] = useState(false);
-  const [dived, setDived] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
   const cvRef = useRef<HTMLDivElement>(null);
-  const lastY = useRef(0);
 
-  /* dive on scroll-down, resurface on scroll-up */
-  useEffect(() => {
-    const onScroll = () => {
-      const y = window.scrollY;
-      const goingDown = y > lastY.current + 2;
-      const goingUp = y < lastY.current - 2;
-      if (goingDown && y > 80) setDived(true);
-      else if (goingUp || y <= 80) setDived(false);
-      lastY.current = y;
-    };
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  /* pause the dive while the CV menu / mobile menu is open */
+  /* pause the CV menu while open (Escape / outside click) */
   useEffect(() => {
     if (!cvOpen) return;
-    const reset = () => setDived(false);
-    reset();
     const onClick = (e: MouseEvent) => {
       if (cvRef.current && !cvRef.current.contains(e.target as Node))
         setCvOpen(false);
@@ -123,12 +102,6 @@ export function Navbar({
     };
   }, [open]);
 
-  useEffect(() => {
-    if (!open) return;
-    const reset = () => setDived(false);
-    reset();
-  }, [open]);
-
   const downloadCV = (opt: (typeof CV_OPTIONS)[number]) => {
     const link = document.createElement("a");
     link.href = opt.href;
@@ -145,53 +118,18 @@ export function Navbar({
       ref={headerRef}
       className="pointer-events-none fixed right-0 top-0 z-50 flex justify-end pr-4 pt-4 sm:pr-6 sm:pt-5"
     >
-      {/* the capsule itself dives; the header stays put */}
-      <motion.div
-        animate={{ y: dived ? "-130%" : "0%" }}
-        transition={{ type: "spring", stiffness: 210, damping: 26 }}
-      >
+      {/* the capsule stays fixed at its position while scrolling */}
+      <div>
         <nav
           aria-label="Primary"
-          className="pointer-events-auto relative flex items-center rounded-full border py-2 pl-2.5 pr-2 backdrop-blur-2xl sm:py-2.5 sm:pl-3"
+          className="pointer-events-auto relative flex items-center rounded-full border py-2 pl-3 pr-2 sm:py-2.5"
           style={{
-            backgroundImage: [GLASS_TINT, GLASS_BASE_PILL].join(", "),
-            borderColor: "rgba(167,139,250,0.38)",
+            backgroundImage: FOLDER_VIOLET,
+            borderColor: "rgba(255,255,255,0.35)",
             boxShadow:
-              "0 0 26px -4px rgba(167,139,250,0.5), 0 18px 45px -20px rgba(0,0,0,0.65), inset 0 1px 0 rgba(255,255,255,0.14)",
+              "0 0 28px -6px rgba(139,92,246,0.65), 0 20px 50px -22px rgba(31,10,80,0.75), inset 0 1px 0 rgba(255,255,255,0.28)",
           }}
         >
-          {/* tiny brand dot — back to top */}
-          <button
-            type="button"
-            onClick={() => onChange("universe")}
-            aria-label={`${profile.name} — back to top`}
-            className="group mr-1 grid h-8 w-8 shrink-0 place-items-center overflow-hidden rounded-full ring-1 ring-white/25 transition-transform duration-300 hover:scale-105"
-            style={{ background: "#1a0b3d" }}
-          >
-            <img
-              src={profileImage}
-              alt=""
-              width={32}
-              height={32}
-              className="h-full w-full object-cover"
-              draggable={false}
-              onError={(e) => {
-                const img = e.target as HTMLImageElement;
-                img.style.display = "none";
-                const parent = img.parentElement;
-                if (parent && !parent.dataset.fallback) {
-                  parent.dataset.fallback = "1";
-                  const span = document.createElement("span");
-                  span.textContent = profile.name.charAt(0);
-                  span.style.color = "#ffffff";
-                  span.style.fontSize = "0.75rem";
-                  span.style.fontWeight = "500";
-                  parent.appendChild(span);
-                }
-              }}
-            />
-          </button>
-
           {/* desktop links */}
           <div className="hidden items-center md:flex">
             {NAV_ITEMS.map((item, i) => (
@@ -204,17 +142,16 @@ export function Navbar({
                 />
               </div>
             ))}
-            <Rule />
 
             {/* CV — the single emphasised action */}
-            <div ref={cvRef} className="relative ml-1">
+            <div ref={cvRef} className="relative ml-1.5">
               <button
                 type="button"
                 onClick={() => setCvOpen((v) => !v)}
                 aria-haspopup="menu"
                 aria-expanded={cvOpen}
                 className={cn(
-                  "flex items-center gap-1.5 rounded-full border border-white/25 bg-white/[0.07] font-mono text-[0.68rem] uppercase tracking-[0.22em] transition-colors duration-300 hover:bg-white/[0.16]",
+                  "flex items-center gap-1.5 rounded-full border border-white/40 bg-white/[0.16] font-mono text-[0.68rem] uppercase tracking-[0.22em] transition-colors duration-300 hover:bg-white/[0.28]",
                   "px-3.5 py-1.5",
                   FOCUS_RING
                 )}
@@ -290,7 +227,7 @@ export function Navbar({
             </button>
           </div>
         </nav>
-      </motion.div>
+      </div>
 
       {/* mobile menu — anchored right, same glass */}
       <AnimatePresence>
