@@ -5,6 +5,7 @@ import {
   useState,
   type ComponentType,
   type CSSProperties,
+  type RefObject,
 } from "react";
 import {
   motion,
@@ -23,7 +24,6 @@ import {
   Network,
   Plug,
   Search,
-  Sparkles,
   Workflow,
   Zap,
 } from "lucide-react";
@@ -98,10 +98,6 @@ type IconType = ComponentType<{
 const GLASS_TINT =
   "linear-gradient(115deg, rgba(245,208,254,0.18) 0%, rgba(255,255,255,0.06) 30%, rgba(219,234,254,0.22) 62%, rgba(167,139,250,0.22) 100%)";
 
-/* Skill chips: cool monochrome blue only */
-const CHIP_TINT =
-  "linear-gradient(115deg, rgba(96,165,250,0.28) 0%, rgba(255,255,255,0.05) 40%, rgba(147,197,253,0.26) 70%, rgba(59,130,246,0.32) 100%)";
-
 const GLASS_BASE_CARD =
   "linear-gradient(180deg, rgba(12,6,40,0.62) 0%, rgba(24,12,66,0.52) 100%)";
 const GLASS_BASE_DEEP =
@@ -142,7 +138,7 @@ const skillIcons: Record<string, { Icon: IconType; color: string }> = {
   FAISS: { Icon: Search, color: "#A3E635" },
   Groq: { Icon: Zap, color: "#F55036" },
   "NVIDIA NIM": { Icon: SiNvidia, color: "#76B900" },
-  Ollama: { Icon: SiOllama, color: "#FFFFFF" },
+  Ollama: { Icon: SiOllama, color: "#17132b" },
   Mistral: { Icon: SiMistralai, color: "#FF7000" },
   "Power BI": { Icon: BarChart3, color: "#F2C811" },
   SSIS: { Icon: Workflow, color: "#7DB3E0" },
@@ -155,7 +151,7 @@ const skillIcons: Record<string, { Icon: IconType; color: string }> = {
   Streamlit: { Icon: SiStreamlit, color: "#FF4B4B" },
   Git: { Icon: SiGit, color: "#F05032" },
   "REST APIs": { Icon: Plug, color: "#A78BFA" },
-  Unity: { Icon: SiUnity, color: "#FFFFFF" },
+  Unity: { Icon: SiUnity, color: "#17132b" },
 };
 
 const skillCategories = [
@@ -242,114 +238,150 @@ function SectionHeading({
   );
 }
 
-/* ---------- Skill chip — cool blue glass ---------- */
-function SkillChip({ name, index }: { name: string; index: number }) {
+/* ---------- Skill tile — paper-ink card, flips violet on hover ---------- */
+/* Violet backdrop tints for the folders (navbar family, no lime) */
+const SK_BG_PLAIN =
+  "linear-gradient(180deg, rgba(12,6,40,0.66) 0%, rgba(24,12,66,0.56) 100%)";
+const SK_BG_SOFT =
+  "linear-gradient(115deg, rgba(167,139,250,0.20) 0%, rgba(255,255,255,0.05) 40%, rgba(139,92,246,0.24) 100%), linear-gradient(180deg, rgba(12,6,40,0.66) 0%, rgba(24,12,66,0.56) 100%)";
+const SK_BG_STRONG =
+  "linear-gradient(115deg, rgba(139,92,246,0.38) 0%, rgba(124,58,237,0.30) 55%, rgba(91,33,182,0.32) 100%), linear-gradient(180deg, rgba(12,6,40,0.70) 0%, rgba(24,12,66,0.60) 100%)";
+
+function SkillTile({ name }: { name: string }) {
   const entry = skillIcons[name];
   const Icon = entry?.Icon;
-  const [isHovered, setIsHovered] = useState(false);
-
-  const stamp = String(index + 1).padStart(2, "0");
 
   return (
-    <div
-      className="group/chip relative flex shrink-0 items-center gap-2.5 rounded-xl border px-4 py-2.5 backdrop-blur-xl transition-[transform,border-color,box-shadow] duration-300 ease-out"
-      style={{
-        backgroundImage: [CHIP_TINT, GLASS_BASE_CARD].join(", "),
-        borderColor:
-          isHovered && entry?.color ? entry.color : "rgba(255,255,255,0.10)",
-        transform: isHovered ? "translateY(-2px)" : "translateY(0)",
-        boxShadow: isHovered
-          ? `0 14px 30px -14px ${entry?.color ?? "rgba(96,165,250,0.6)"}66, 0 1px 0 rgba(255,255,255,0.16) inset`
-          : "0 1px 0 rgba(255,255,255,0.10) inset",
-      }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      <span
-        className="font-mono text-[0.58rem] tabular-nums transition-colors duration-300"
-        style={{
-          color: isHovered
-            ? "rgba(147,197,253,0.95)"
-            : "rgba(255,255,255,0.32)",
-        }}
-      >
-        {stamp}
+    <div className="sk-tile" title={name}>
+      <span className="sk-ic" style={{ color: entry?.color ?? "#5b21b6" }}>
+        {Icon ? (
+          <Icon style={{ width: "1.9rem", height: "1.9rem", transition: "transform .5s cubic-bezier(.16,1,.3,1)" }} />
+        ) : (
+          <span className="font-mono text-[1rem] leading-none">{name.slice(0, 2)}</span>
+        )}
       </span>
-
-      <span
-        aria-hidden
-        className="h-3 w-px transition-colors duration-300"
-        style={{
-          background: isHovered
-            ? "rgba(147,197,253,0.55)"
-            : "rgba(255,255,255,0.12)",
-        }}
-      />
-
-      {Icon ? (
-        <Icon
-          className="h-4 w-4 shrink-0 transition-transform duration-300 motion-reduce:transition-none"
-          style={{
-            color: entry.color,
-            transform: isHovered ? "scale(1.12)" : "scale(1)",
-          }}
-        />
-      ) : (
-        <Sparkles className="h-4 w-4 shrink-0 text-white/50" />
-      )}
-
-      <span
-        className="whitespace-nowrap font-sans text-sm font-medium transition-colors duration-300"
-        style={{
-          color:
-            isHovered && entry?.color ? entry.color : "rgba(255,255,255,0.85)",
-        }}
-      >
-        {name}
-      </span>
+      <span className="px-1 leading-tight">{name}</span>
     </div>
   );
 }
 
-/* ---------- Skill marquee row ---------- */
-function SkillCategoryRow({
+/* ---------- Skill folder — group panel with tab, tilt & corner marks ---------- */
+function SkillFolder({
   category,
-  duration,
-  reverse = false,
+  index,
 }: {
   category: { title: string; items: string[] };
-  duration: number;
-  reverse?: boolean;
+  index: number;
 }) {
-  const doubled = [...category.items, ...category.items];
+  const ref = useRef<HTMLDivElement>(null);
+
+  const bg =
+    index === 2 ? SK_BG_STRONG : index % 2 === 0 ? SK_BG_SOFT : SK_BG_PLAIN;
+
+  function onMove(e: React.PointerEvent) {
+    const el = ref.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const u = (e.clientX - r.left) / r.width - 0.5;
+    const v = (e.clientY - r.top) / r.height - 0.5;
+    el.style.setProperty("--ry", `${(u * 7).toFixed(2)}deg`);
+    el.style.setProperty("--rx", `${(-v * 7).toFixed(2)}deg`);
+  }
+
+  function onLeave() {
+    const el = ref.current;
+    if (!el) return;
+    el.style.setProperty("--rx", "0deg");
+    el.style.setProperty("--ry", "0deg");
+  }
 
   return (
-    <div className="space-y-2" data-skill-row>
-      <div className="flex items-baseline justify-between gap-3 px-1">
-        <h4 className="font-sans text-[0.95rem] font-semibold text-white select-none">
-          {category.title}
-        </h4>
-        <span className="font-sans text-[0.78rem] text-white/55">
-          {String(category.items.length).padStart(2, "0")} tools
+    <div className="sk-folder" ref={ref} style={{ ["--sk-bg" as string]: bg }} onPointerMove={onMove} onPointerLeave={onLeave} data-sk-folder>
+      <div className="sk-tab">
+        <span>
+          {String(index + 1).padStart(2, "0")} {category.title.toUpperCase()}
         </span>
       </div>
-      <div className="marquee-track marquee-mask overflow-hidden py-1">
-        <div
-          className="animate-marquee flex w-max gap-3"
-          style={{
-            ["--marquee-duration" as string]: `${duration}s`,
-            animationDirection: reverse ? "reverse" : "normal",
-          }}
-        >
-          {doubled.map((name, i) => (
-            <SkillChip
-              key={`${category.title}-${name}-${i}`}
-              name={name}
-              index={i % category.items.length}
-            />
-          ))}
-        </div>
+      <span className="sk-plus" aria-hidden>+</span>
+      <span className="sk-plus" aria-hidden>+</span>
+      <div className="sk-grid">
+        {category.items.map((name) => (
+          <SkillTile key={name} name={name} />
+        ))}
       </div>
+    </div>
+  );
+}
+
+/* ---------- Crosshair cursor + live coordinates (scoped to the toolbox) ---------- */
+function SkillCrosshair({
+  containerRef,
+}: {
+  containerRef: RefObject<HTMLDivElement | null>;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const state = useRef({ mx: 0, my: 0, px: -100, py: -100, vis: false, fr: 0 });
+  const inZone = useRef(false);
+
+  useEffect(() => {
+    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+    const el = ref.current;
+    const zone = containerRef.current;
+    if (!el || !zone) return;
+
+    const s = state.current;
+    const coords = el.querySelector(".sk-coord");
+    let raf = 0;
+
+    const onMove = (e: PointerEvent) => {
+      s.mx = e.clientX;
+      s.my = e.clientY;
+      const r = zone.getBoundingClientRect();
+      inZone.current =
+        e.clientX >= r.left && e.clientX <= r.right &&
+        e.clientY >= r.top && e.clientY <= r.bottom;
+    };
+    const onOver = (e: Event) => {
+      const t = e.target as Element | null;
+      s.vis = !!t?.closest?.("[data-sk-folder]");
+    };
+
+    document.addEventListener("pointermove", onMove, { passive: true });
+    zone.addEventListener("pointerover", onOver);
+
+    let last = "";
+    const loop = () => {
+      s.px += (s.mx - s.px) * 0.4; /* same easing as the reference (lerp 0.4) */
+      s.py += (s.my - s.py) * 0.4;
+      const tx = `translate(${s.px.toFixed(1)}px,${s.py.toFixed(1)}px)`;
+      if (tx !== last) { last = tx; el.style.transform = tx; }
+      const active = inZone.current;
+      const op = active ? "1" : "0";
+      if (el.style.opacity !== op) el.style.opacity = op;
+      const hv = active && s.vis;
+      if (el.classList.contains("hv") !== hv) el.classList.toggle("hv", hv);
+      if (++s.fr % 3 === 0) {
+        const txt =
+          String(Math.round(s.mx)).padStart(3, "0") + "," +
+          String(Math.round(s.my + window.scrollY)).padStart(4, "0");
+        if (coords && coords.textContent !== txt) coords.textContent = txt;
+      }
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      document.removeEventListener("pointermove", onMove);
+      zone.removeEventListener("pointerover", onOver);
+    };
+  }, [containerRef]);
+
+  /* fixed, inline (no portal — portals into <body> break under this app's SSR/hydration) */
+  return (
+    <div className="sk-cur" ref={ref} aria-hidden>
+      <i />
+      <b className="sk-coord">000,0000</b>
     </div>
   );
 }
@@ -1007,6 +1039,7 @@ export function AboutSection({
 }) {
   const sectionRef = useRef<HTMLDivElement>(null);
   const leftColRef = useRef<HTMLDivElement>(null);
+  const skillsRef = useRef<HTMLDivElement>(null);
 
   const [selectedCertIndex, setSelectedCertIndex] = useState<number | null>(
     null
@@ -1213,15 +1246,20 @@ export function AboutSection({
             accent="& tools"
             sub="What I use day to day, grouped by area."
           />
-          <div className="mt-10 flex flex-col gap-6">
+          <div
+            ref={skillsRef}
+            className="mt-14 grid grid-cols-1 gap-16 lg:grid-cols-2 lg:items-start lg:gap-12"
+          >
             {skillCategories.map((category, index) => (
-              <SkillCategoryRow
+              <div
                 key={category.title}
-                category={category}
-                duration={28 + index * 4}
-                reverse={index % 2 === 1}
-              />
+                data-skill-row
+                className={index % 2 === 1 ? "lg:mt-14" : undefined}
+              >
+                <SkillFolder category={category} index={index} />
+              </div>
             ))}
+            <SkillCrosshair containerRef={skillsRef} />
           </div>
         </section>
 
