@@ -149,6 +149,15 @@
   }
 }
 
+/* Case-file modal: hide the native scrollbar — a fixed intro-style rail
+   on the right communicates progress instead. */
+.scroll-none {
+  scrollbar-width: none;
+}
+.scroll-none::-webkit-scrollbar {
+  display: none;
+}
+
 /* ==========================================================================
    LENIS SMOOTH SCROLL
    ========================================================================== */

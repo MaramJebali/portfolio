@@ -45,13 +45,12 @@ export function mountScene(
     const cover = p.cover
       ? `<img src="${p.cover}" alt="${p.title} screenshot" loading="lazy" decoding="async">`
       : "";
-    return `<article class="dk v${i % 3}"><div class="pm"><div class="ph">${cover}</div>
+    return `<article class="dk v${i % 3}" data-case="${p.slug}"><div class="pm"><div class="ph">${cover}</div>
       <div class="plg" title="${p.title}">${p.title.slice(0, 2)}</div></div>
       <div class="pb"><div class="lab">${pad(i)} · ${p.category}${p.period ? " · " + p.period : ""}</div>
       <h3 class="d">${p.title}</h3><p class="tg">${p.tagline}</p>
-      <ul class="hl">${p.bullets.map(c => `<li>${c}</li>`).join("")}</ul>
       <div class="chips">${p.tags.map(chip).join("")}</div>
-      <div class="pr"><a class="pill" href="#p-${p.slug}">View project →</a>${
+      <div class="pr"><a class="pill" data-case="${p.slug}" href="#p-${p.slug}">View project →</a>${
         p.github ? ` <a class="pill" target="_blank" rel="noopener" href="${p.github}">GitHub ↗</a>` : ""
       }</div></div></article>`;
   }).join("");
@@ -73,7 +72,7 @@ export function mountScene(
   /* full-list rows (pidx) */
   pidx.innerHTML = '<div class="lab">All projects · click any row</div>' +
     projects.map((p, i) =>
-      `<a class="pn2" data-cat="${p.category}" href="#p-${p.slug}"><span class="lab">${pad(i)}</span>
+      `<a class="pn2" data-cat="${p.category}" data-case="${p.slug}" href="#p-${p.slug}"><span class="lab">${pad(i)}</span>
         <span class="d nm">${p.title}</span>
         <span class="pd2"><span>${p.tagline}</span><span class="chips">${p.tags.slice(0, 4).map(chip).join("")}</span></span>
         <span class="d ar2">→</span></a>`).join("");
@@ -110,7 +109,8 @@ export function mountScene(
   const eob = (t: number) => { t = cl(t); const e = 1.5; return 1 + (e + 1) * Math.pow(t - 1, 3) + e * Math.pow(t - 1, 2); };
   const lp = (a: number, b: number, t: number) => a + (b - a) * t;
 
-  const REST = [
+  /* REST pile — exact values from the original (main.js@105949) */
+  const REST: [number, number, number, number][] = [
     [-.17, .07, -9, .6], [.19, -.03, 7, .64], [-.04, .12, -4, .58], [.22, .03, 12, .62],
     [-.22, -.05, 6, .56], [.07, .09, -7, .66], [-.12, .02, 10, .6], [.14, .1, -11, .58]
   ];
@@ -135,7 +135,9 @@ export function mountScene(
     return { x: lp(l * v, u.x, d), y: lp(r - 28, u.y, d), r: lp(l * 13, u.r, d), s: lp(1.015, u.s, d), o: 1 - d, z: 30, pe: !1 };
   }
 
-  /* dkpose — exact intro blend (REST spread → fan), main.js@106706 */
+  /* dkpose — exact intro blend (REST spread → fan), main.js@106706 — restored
+     verbatim from the original source: n²·6 row curve, n·6° fan tilt, .34
+     fan scale, ×5 breathing wobble, and the original fixed REST pile. */
   function dkpose(t: number, e: number, a: number, c: number, o: number, l: number, r: number, v: number) {
     const s = dkdeck(t, e, o, l, r);
     const K = innerWidth <= 900 ? 1 : 0.8;
@@ -204,11 +206,17 @@ export function mountScene(
             };
           C(z, A, 0); C(L, flp, 1.7);
           HV += (cl(1 - Math.hypot(PSX - (z.left + z.width / 2), PSY - (z.top + z.height / 2)) / (z.width * .75)) - HV) * .1;
-          stg.style.setProperty("--hv", HV.toFixed(3));
+          /* damp the hover glow: full --hv blew the shadows/sheen up so
+             intensely that every idle repaint read as jitter */
+          stg.style.setProperty("--hv", (HV * .55).toFixed(3));
         }
         fw1.style.opacity = fw2.style.opacity = (g * (1 - ss((h - .8) / .18))).toFixed(2);
         stg.style.setProperty("--ar", g.toFixed(2));
-        stg.style.setProperty("--sh", (.5 + .5 * Math.sin(deckT * 1.3 + r / 2500)).toFixed(3));
+        /* shine sweep driven by deck position only (NOT wall-clock time):
+           it sweeps while the folder opens / deck shuffles, and freezes the
+           moment you stop scrolling — the idle time-oscillation made the
+           folder visibly "breathe" while just hovering. */
+        stg.style.setProperty("--sh", (.5 + .5 * Math.sin(deckT * 1.3)).toFixed(3));
         fw1.style.visibility = fw2.style.visibility = h > .99 ? "hidden" : "visible";
         flp.style.transform = `perspective(1100px) rotateX(${(-f * 74).toFixed(1)}deg)`;
         fh.style.opacity = (1 - ss(h / .1)).toFixed(2);

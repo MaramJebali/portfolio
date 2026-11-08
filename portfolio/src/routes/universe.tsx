@@ -58,7 +58,7 @@ function Universe() {
 
       {/* Work — the deck scene owns its own scroll space, so it renders outside
           the motion.section (transform animations would break its fixed overlay) */}
-      {active === "works" && <ProjectsScene />}
+      {active === "works" && <ProjectsScene onOpenProject={setProject} />}
 
       {active !== "works" && (
         <main className="relative z-10 pt-16">

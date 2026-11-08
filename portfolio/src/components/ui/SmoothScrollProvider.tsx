@@ -39,6 +39,8 @@ export function SmoothScrollProvider({ children }: SmoothScrollProviderProps) {
         touchMultiplier: 1.5,
       });
       lenisRef.current = lenis;
+      // Expose for story-driven routes that reuse the shared instance
+      (window as any).__lenis = lenis;
 
       const onScroll = () => ScrollTrigger.update();
       lenis.on("scroll", onScroll);
@@ -57,6 +59,7 @@ export function SmoothScrollProvider({ children }: SmoothScrollProviderProps) {
         lenis.off("scroll", onScroll);
         lenis.destroy();
         lenisRef.current = null;
+        (window as any).__lenis = null;
       };
     });
 

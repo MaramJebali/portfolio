@@ -1,0 +1,79 @@
+/* ==================================================================
+   Display font — Ed Benguiat Roman
+   ================================================================== */
+@font-face {
+  font-family: "Benguiat Roman";
+  src: url("/fonts/ed-benguiat-roman.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ==================================================================
+   Hide scrollbar for the horizontal track
+   ================================================================== */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ==================================================================
+   Filmstrip — auto-scroll for the card + gallery inside the modal
+   ================================================================== */
+@keyframes project-filmstrip {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
+}
+
+.project-filmstrip-track.is-scrolling {
+  animation: project-filmstrip 55s linear infinite;
+  will-change: transform;
+}
+
+.project-card:hover .project-filmstrip-track.is-scrolling,
+.project-card:focus-within .project-filmstrip-track.is-scrolling {
+  animation-play-state: paused;
+}
+
+.project-filmstrip-track.is-scrolling:hover {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .project-filmstrip-track.is-scrolling {
+    animation: none;
+  }
+}
+
+/* ==================================================================
+   Drifting starfield — sells the "traveling forward" feel.
+   ================================================================== */
+.project-starfield {
+  background-image:
+    radial-gradient(1px 1px at 20% 30%, rgba(255, 255, 255, 0.55) 50%, transparent 51%),
+    radial-gradient(1px 1px at 70% 20%, rgba(255, 255, 255, 0.35) 50%, transparent 51%),
+    radial-gradient(1px 1px at 40% 80%, rgba(255, 255, 255, 0.45) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 85% 65%, rgba(255, 255, 255, 0.5) 50%, transparent 51%),
+    radial-gradient(1px 1px at 10% 90%, rgba(255, 255, 255, 0.4) 50%, transparent 51%),
+    radial-gradient(1px 1px at 55% 45%, rgba(255, 255, 255, 0.35) 50%, transparent 51%),
+    radial-gradient(1px 1px at 30% 60%, rgba(255, 255, 255, 0.3) 50%, transparent 51%);
+  background-size: 1200px 1200px;
+  animation: project-starfield-drift 90s linear infinite;
+}
+
+@keyframes project-starfield-drift {
+  from { background-position: 0 0; }
+  to { background-position: -1200px 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .project-starfield { animation: none; }
+}
+
+/* GSAP SplitText line visibility fix */
+.split-line {
+  will-change: transform, opacity;
+}

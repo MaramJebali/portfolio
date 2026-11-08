@@ -1,32 +1,63 @@
-/* ProjectsScene — React wrapper around the ported deck/detail engine.
+/* ProjectsScene — React wrapper around the ported deck engine.
    Markup mirrors the studied portfolio's #projects section 1:1; the engine
    (scene.ts) fills the dynamic parts (deck cards, dots, pidx rows, glow/rim
    layers) on mount and tears everything down on unmount.
 
-   The #pp detail shell is a sibling of the section (never inside a transformed
-   ancestor) so its position:fixed overlay behaves exactly like the original. */
+   Clicking any project (card, "View project" pill or full-list row) opens the
+   route-level case-file modal (ProjectModal) via onOpenProject. */
 
 import { useEffect, useMemo, useRef } from "react";
-import { projects as sourceProjects } from "@/data/portfolio";
+import { projects as sourceProjects, type Project } from "@/data/portfolio";
 import { toSceneProjects } from "./mapData";
 import { mountScene, type SceneHandle } from "./scene";
-import { mountDetail, type DetailHandle } from "./detail";
 import "./scene.css";
 
-export function ProjectsScene() {
+export function ProjectsScene({
+  onOpenProject,
+}: {
+  onOpenProject?: (p: Project) => void;
+}) {
   const rootRef = useRef<HTMLDivElement>(null);
-  const ppRef = useRef<HTMLDivElement>(null);
-  const sceneProjects = useMemo(() => toSceneProjects(sourceProjects), []);
+  const openRef = useRef(onOpenProject);
+  openRef.current = onOpenProject;
+  const sceneProjects = useMemo(() => {
+    /* hidden from the works scene only — the data stays for elsewhere */
+    const HIDDEN = new Set([
+      "commercial-post",
+      "esg-classification",
+      "valoraise",
+      "ieee-xtreme",
+      "deepflow",
+      "indabax",
+    ]);
+    const list = toSceneProjects(sourceProjects).filter(p => !HIDDEN.has(p.slug));
+    /* projects with a live GitHub repo lead the deck */
+    return [...list.filter(p => p.github), ...list.filter(p => !p.github)];
+  }, []);
 
   useEffect(() => {
-    const root = rootRef.current, pp = ppRef.current;
-    if (!root || !pp) return;
+    const root = rootRef.current;
+    if (!root) return;
 
     const scene: SceneHandle = mountScene(root, sceneProjects);
-    const detail: DetailHandle = mountDetail(pp, sceneProjects, "Maram Jebali");
+
+    /* capture-phase click interception: any [data-case] target opens the
+       case-file modal instead of the old #p- hash detail overlay */
+    const onClick = (e: MouseEvent) => {
+      const el = (e.target as HTMLElement | null)?.closest?.("[data-case]") as HTMLElement | null;
+      if (!el) return;
+      const slug = el.dataset.case;
+      const found = sourceProjects.find(p => (p.slug ?? p.id) === slug);
+      if (found && openRef.current) {
+        e.preventDefault();
+        e.stopPropagation();
+        openRef.current(found);
+      }
+    };
+    root.addEventListener("click", onClick, true);
 
     return () => {
-      detail.dispose();
+      root.removeEventListener("click", onClick, true);
       scene.dispose();
     };
   }, [sceneProjects]);
@@ -70,9 +101,6 @@ export function ProjectsScene() {
 
         <div className="pidx" id="pidx"></div>
       </section>
-
-      {/* full-screen detail shell — fixed overlay, filled by the engine */}
-      <div id="pp" ref={ppRef} aria-hidden="true" />
     </div>
   );
 }

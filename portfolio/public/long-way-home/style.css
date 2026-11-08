@@ -1,0 +1,564 @@
+/* =================================================================
+   THE LONG WAY HOME
+   A goodbye told as a journey through deep space.
+   Design language: near-black void, one cold blue spent at the start,
+   one warm light (#FFB36B) that opens and closes the piece.
+   ================================================================= */
+
+/* ---------- Design tokens ---------------------------------------- */
+:root {
+  /* Palette — restrained; accents almost never appear together */
+  --bg:            #04050A;   /* near-black void (not pure #000, so bloom reads) */
+  --bg-true:       #02030A;   /* reserved for the held-stillness beats */
+  --cold:          #8FB8E0;   /* Earth's blue — spent once, never returns */
+  --nebula-core:   #1B1E3C;
+  --ember:         #C2724A;
+  --thread:        #2FB9A6;   /* the one impossible teal */
+  --violet:        #C68BFF;   /* the nebula's emotional peak */
+  --warm:          #FFB36B;   /* THE load-bearing hue: porch light → last star */
+  --text-high:     #EAF0FF;   /* awe lines */
+  --text-whisper:  #8A93A8;   /* the voice of the machine */
+
+  /* Type */
+  --display: "Fraunces", "Times New Roman", serif;
+  --ui:      "Inter", system-ui, -apple-system, sans-serif;
+
+  /* Motion */
+  --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);     /* expo.out-ish — words settle */
+  --ease-drift: cubic-bezier(0.65, 0, 0.35, 1);    /* power2.inOut — drifting */
+
+  /* Layout */
+  --gutter: clamp(1.4rem, 5vw, 6rem);
+  --rail-color: var(--warm);
+}
+
+/* ---------- Reset ------------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  font-family: var(--ui);
+  background: var(--bg);
+  color: var(--text-high);
+  overflow-x: hidden;
+  /* Lenis controls scroll; keep native momentum off until JS decides */
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Hide everything but the preloader until the reveal */
+body.is-loading { overflow: hidden; height: 100vh; }
+
+/* When JS is absent or fails, never trap the user behind the loader */
+.no-js .preloader { display: none; }
+
+::selection { background: rgba(255, 179, 107, 0.25); color: #fff; }
+
+button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; }
+
+/* =================================================================
+   WEBGL CANVAS + ATMOSPHERE OVERLAYS
+   ================================================================= */
+.webgl {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  display: block;
+  opacity: 0;                       /* faded up by the preloader reveal */
+  transition: opacity 1.6s var(--ease-drift);
+  pointer-events: none;
+}
+body.is-ready .webgl { opacity: 1; }
+
+/* CSS-only nebula shown only if WebGL is unsupported */
+.webgl-fallback {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  display: none;
+  background:
+    radial-gradient(120% 80% at 50% 120%, rgba(198, 139, 255, 0.18), transparent 55%),
+    radial-gradient(90% 60% at 70% 30%, rgba(47, 185, 166, 0.10), transparent 60%),
+    radial-gradient(70% 50% at 20% 80%, rgba(194, 114, 74, 0.14), transparent 60%),
+    var(--bg);
+}
+body.no-webgl .webgl-fallback { display: block; }
+body.no-webgl .webgl { display: none; }
+
+/* Film grain — animated, very subtle, costs nothing on the GPU */
+.grain {
+  position: fixed;
+  inset: -50%;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain 6s steps(6) infinite;
+}
+@keyframes grain {
+  0%   { transform: translate(0, 0); }
+  20%  { transform: translate(-6%, 4%); }
+  40%  { transform: translate(4%, -6%); }
+  60%  { transform: translate(-4%, 6%); }
+  80%  { transform: translate(6%, -4%); }
+  100% { transform: translate(0, 0); }
+}
+
+/* Cinematic vignette */
+.vignette {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: radial-gradient(120% 120% at 50% 50%, transparent 55%, rgba(0, 0, 0, 0.55) 100%);
+}
+
+/* =================================================================
+   PRELOADER
+   ================================================================= */
+.preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: var(--bg-true);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2.5rem;
+}
+.preloader__inner { display: flex; flex-direction: column; align-items: center; gap: 1.6rem; }
+.preloader__label {
+  font-family: var(--ui);
+  font-size: 0.7rem;
+  letter-spacing: 0.42em;
+  text-indent: 0.42em;
+  color: var(--text-whisper);
+}
+.preloader__count {
+  font-family: var(--display);
+  font-weight: 300;
+  font-variation-settings: "opsz" 80;
+  display: flex;
+  align-items: baseline;
+  color: var(--text-high);
+  line-height: 1;
+}
+.preloader__num { font-size: clamp(4rem, 16vw, 9rem); font-variant-numeric: tabular-nums; }
+.preloader__pct { font-size: clamp(1.2rem, 3vw, 2rem); margin-left: 0.2em; color: var(--warm); }
+.preloader__track {
+  width: clamp(160px, 30vw, 320px);
+  height: 1px;
+  background: rgba(234, 240, 255, 0.14);
+  overflow: hidden;
+}
+.preloader__fill {
+  display: block;
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--cold), var(--warm));
+  box-shadow: 0 0 12px var(--warm);
+}
+.preloader__title {
+  position: absolute;
+  bottom: clamp(1.5rem, 5vh, 3rem);
+  font-family: var(--ui);
+  font-size: 0.62rem;
+  letter-spacing: 0.5em;
+  text-indent: 0.5em;
+  color: rgba(138, 147, 168, 0.5);
+}
+
+/* =================================================================
+   CUSTOM CURSOR
+   ================================================================= */
+.cursor {
+  position: fixed;
+  top: 0; left: 0;
+  z-index: 90;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  will-change: transform;
+}
+body.has-cursor .cursor { opacity: 1; }
+.cursor__dot,
+.cursor__ring {
+  position: absolute;
+  top: 0; left: 0;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+.cursor__dot {
+  width: 6px; height: 6px;
+  background: var(--warm);
+  box-shadow: 0 0 10px 2px rgba(255, 179, 107, 0.6);
+}
+.cursor__ring {
+  width: 34px; height: 34px;
+  border: 1px solid rgba(255, 179, 107, 0.5);
+  transition: width 0.3s var(--ease-soft), height 0.3s var(--ease-soft),
+              border-color 0.3s ease, background-color 0.3s ease;
+}
+body.cursor-hover .cursor__ring {
+  width: 58px; height: 58px;
+  border-color: rgba(255, 179, 107, 0.9);
+  background: rgba(255, 179, 107, 0.06);
+}
+/* Finale "hold still" reward: the cursor brightens */
+body.cursor-held .cursor__dot { box-shadow: 0 0 22px 6px rgba(255, 179, 107, 0.95); }
+body.cursor-held .cursor__ring { border-color: rgba(255, 179, 107, 0.95); width: 70px; height: 70px; }
+
+/* =================================================================
+   FIXED UI — rail, telemetry, scroll cue
+   ================================================================= */
+.rail {
+  position: fixed;
+  top: 0; right: clamp(1rem, 3vw, 2.4rem);
+  width: 1px; height: 100vh; height: 100svh;   /* svh tracks the dynamic mobile viewport */
+  z-index: 40;
+  background: rgba(234, 240, 255, 0.08);
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+body.is-ready .rail { opacity: 1; }
+.rail__fill {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 0%;
+  transform-origin: top;
+  background: var(--rail-color);
+  box-shadow: 0 0 10px var(--rail-color);
+  transition: background-color 1.2s var(--ease-drift), box-shadow 1.2s var(--ease-drift);
+}
+
+.telemetry {
+  position: fixed;
+  left: var(--gutter); bottom: clamp(1.2rem, 4vh, 2.2rem);
+  z-index: 40;
+  font-family: var(--ui);
+  font-size: 0.66rem;
+  letter-spacing: 0.28em;
+  color: var(--text-whisper);
+  font-variant-numeric: tabular-nums;
+  display: flex; align-items: center; gap: 0.7em;
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+body.is-ready .telemetry { opacity: 0.75; }
+.telemetry__dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--warm);
+  box-shadow: 0 0 8px var(--warm);
+  animation: pulse 3.2s var(--ease-drift) infinite;
+}
+@keyframes pulse { 0%,100% { opacity: 0.4; } 50% { opacity: 1; } }
+#telemetryText { transition: opacity 0.5s ease; }
+
+.scrollcue {
+  position: fixed;
+  left: 50%; bottom: clamp(1.2rem, 4vh, 2.2rem);
+  transform: translateX(-50%);
+  z-index: 40;
+  display: flex; flex-direction: column; align-items: center; gap: 0.8rem;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+body.is-ready .scrollcue { opacity: 0.8; }
+body.scrolled .scrollcue { opacity: 0 !important; pointer-events: none; }
+.scrollcue__word {
+  font-size: 0.6rem; letter-spacing: 0.5em; text-indent: 0.5em;
+  color: var(--text-whisper);
+}
+.scrollcue__line {
+  position: relative;
+  width: 1px; height: 42px;
+  background: rgba(234, 240, 255, 0.12);
+  overflow: hidden;
+}
+.scrollcue__line::after {
+  content: "";
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 40%;
+  background: var(--warm);
+  box-shadow: 0 0 8px var(--warm);
+  animation: cue 2.6s var(--ease-drift) infinite;
+}
+@keyframes cue {
+  0%   { transform: translateY(-100%); }
+  60%  { transform: translateY(250%); }
+  100% { transform: translateY(250%); }
+}
+
+/* =================================================================
+   CONTENT — the six movements
+   ================================================================= */
+.content { position: relative; z-index: 10; }
+
+.beat {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
+  padding: 12vh var(--gutter);
+  display: flex;
+  flex-direction: column;
+}
+.beat--center { align-items: center; justify-content: center; text-align: center; }
+.beat--tall { min-height: 230vh; }                 /* weaponise the emptiness */
+/* Finale rests in the last viewport: star held high, words beneath it. */
+.beat--finale { min-height: 120vh; justify-content: flex-end; padding-bottom: 24vh; }
+
+.beat__inner {
+  position: relative;
+  max-width: min(92vw, 60rem);
+  /* faint scrim so type always wins over the busiest frames */
+  isolation: isolate;
+}
+.beat__inner::before {
+  content: "";
+  position: absolute;
+  inset: -18% -12%;
+  z-index: -1;
+  background: radial-gradient(60% 60% at 50% 50%, rgba(2, 3, 10, 0.55), transparent 75%);
+  pointer-events: none;
+}
+
+/* For the tall planets beat, pin the words near the top so the
+   long emptiness below is felt as content, not as a layout gap. */
+.beat--tall { justify-content: flex-start; }
+.beat--tall .beat__inner { margin-top: 12vh; }
+
+/* EXPERIMENT (narrative v2): center the tall beat's text block so it sits
+   exactly halfway between the previous and next movements. */
+.beat--tall { justify-content: center; align-items: center; }
+.beat--tall .beat__inner { margin-top: 0; }
+.beat--tall .sub { max-width: 44ch; }
+
+/* EXPERIMENT: the "constellations" note drifts alone in the void, placed at
+   the scroll midpoint between movement III's words and movement IV's words.
+   Measured against real headline centers: 50% + 37vh lands equidistant. */
+.drift--between {
+  bottom: auto;
+  top: calc(50% + 37vh);
+  max-width: 22ch;
+}
+@media (max-width: 540px) {
+  /* beat--tall is 160vh here; midpoint below its center = ~30vh */
+  .drift--between { top: calc(50% + 30vh); }
+}
+@media (max-width: 540px) and (orientation: portrait) {
+  /* beat--tall is 120vh here; midpoint below its center = ~42vh */
+  .drift--between { top: calc(50% + 42vh); }
+}
+
+.eyebrow {
+  font-family: var(--ui);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.42em;
+  text-indent: 0.42em;
+  text-transform: uppercase;
+  color: var(--text-whisper);
+  margin-bottom: clamp(1.4rem, 3vw, 2.4rem);
+}
+
+.headline {
+  font-family: var(--display);
+  font-weight: 380;
+  font-variation-settings: "opsz" 144, "SOFT" 0, "WONK" 0;
+  font-size: clamp(2.6rem, 8vw, 7rem);
+  line-height: 0.98;
+  letter-spacing: 0.005em;
+  color: var(--text-high);
+  text-wrap: balance;
+}
+.headline--hero { font-size: clamp(2.2rem, 5.6vw, 5rem); }
+.headline--finale {
+  font-size: clamp(2.4rem, 6.2vw, 5.6rem);
+  letter-spacing: -0.012em;
+  line-height: 1.08;
+}
+.headline--bloom { text-shadow: 0 0 60px rgba(198, 139, 255, 0.35); }
+
+.sub {
+  font-family: var(--ui);
+  font-weight: 400;
+  font-size: clamp(1.1rem, 1.75vw, 1.42rem);
+  line-height: 1.62;
+  letter-spacing: 0.01em;
+  color: #F4F7FF;
+  text-shadow: 0 0 22px rgba(234, 240, 255, 0.38), 0 0 46px rgba(255, 179, 107, 0.14);
+  opacity: 0.95;
+  max-width: 36ch;
+  margin: clamp(1.6rem, 3vw, 2.4rem) auto 0;
+}
+.sub--italic {
+  font-family: var(--display);
+  font-style: italic;
+  font-weight: 360;
+  font-size: clamp(1.15rem, 2vw, 1.5rem);
+  opacity: 0.92;
+  letter-spacing: 0;
+  max-width: 30ch;
+}
+.sub--final { opacity: 0.7; margin-top: clamp(2rem, 4vw, 3rem); }
+
+.drift {
+  position: absolute;
+  left: 50%;
+  bottom: 14vh;
+  transform: translateX(-50%);
+  font-family: var(--display);
+  font-style: italic;
+  font-weight: 320;
+  font-size: clamp(1.05rem, 1.8vw, 1.45rem);
+  line-height: 1.55;
+  text-align: center;
+  color: var(--text-high);
+  opacity: 0.55;
+  max-width: 30ch;
+}
+
+.finale__hint {
+  margin-top: clamp(2.4rem, 6vh, 4rem);
+  font-family: var(--ui);
+  font-size: 0.64rem;
+  letter-spacing: 0.4em;
+  text-indent: 0.4em;
+  text-transform: uppercase;
+  color: var(--text-whisper);
+}
+
+/* ---------- Split-text reveal primitives ------------------------- */
+/* Outer span masks; inner span is what we translate/fade. */
+.word, .char {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+}
+/* keeps a char-split word on one line so it never breaks mid-letter */
+.char-word { display: inline-block; white-space: nowrap; }
+.word__inner, .char__inner {
+  display: inline-block;
+  opacity: 0;             /* GSAP owns the transform — a CSS %-transform reads
+                             back as px and corrupts the yPercent animation */
+  will-change: transform, opacity;
+}
+/* Non-split reveal targets */
+[data-reveal] { opacity: 0; will-change: transform, opacity; }
+
+/* =================================================================
+   FOOTER
+   ================================================================= */
+.footer {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  padding: 2.4rem var(--gutter) clamp(1.6rem, 4vh, 2.6rem);
+  z-index: 11;
+}
+.footer__rule { height: 1px; background: rgba(234, 240, 255, 0.1); margin-bottom: 1.6rem; }
+.footer__row { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; flex-wrap: wrap; }
+.footer__row--sub { margin-top: 0.8rem; }
+.footer__title { font-family: var(--ui); font-size: 0.72rem; letter-spacing: 0.4em; color: var(--text-high); }
+.footer__meta { font-family: var(--ui); font-size: 0.66rem; letter-spacing: 0.18em; color: var(--text-whisper); }
+.footer__meta--dim { opacity: 0.6; }
+.footer__replay {
+  font-family: var(--ui);
+  font-size: 0.7rem; letter-spacing: 0.22em;
+  color: var(--warm);
+  position: relative;
+  padding-bottom: 3px;
+  transition: color 0.3s ease;
+}
+.footer__replay::after {
+  content: ""; position: absolute; left: 0; bottom: 0;
+  width: 100%; height: 1px; background: var(--warm);
+  transform: scaleX(0); transform-origin: left;
+  transition: transform 0.5s var(--ease-soft);
+}
+.footer__replay:hover::after { transform: scaleX(1); }
+
+/* =================================================================
+   RESPONSIVE
+   ================================================================= */
+@media (max-width: 768px) {
+  :root { --gutter: 1.5rem; }
+  .beat--tall { min-height: 180vh; }
+  .drift { bottom: 10vh; }
+  .rail { right: 0.8rem; }
+  .telemetry { font-size: 0.58rem; letter-spacing: 0.2em; }
+  /* keep Fraunces from going spindly on small / low-DPI screens */
+  .headline { font-weight: 420; text-shadow: 0 0 30px rgba(4, 5, 10, 0.6); }
+}
+
+@media (max-width: 768px) and (pointer: coarse) {
+  .cursor { display: none; }
+}
+
+/* Portrait phones: reduce the long empty beat so it doesn't feel broken */
+@media (max-width: 540px) {
+  .beat--tall { min-height: 160vh; }
+  .scrollcue { display: none; }
+  /* SS7: the fixed telemetry ("SIGNAL · HOME") and the absolute footer credit
+     ("…built with light") both live at the bottom-left and overlap on phones.
+     Lift the footer content clear of the telemetry band, and drop the telemetry
+     into the gap below it so they read as two separate lines. */
+  .footer { padding-bottom: clamp(3.6rem, 13vh, 5.5rem); }
+  .footer__row { row-gap: 0.4rem; }
+  .telemetry { bottom: clamp(0.85rem, 2.6vh, 1.4rem); }
+}
+
+/* True portrait phones: trim cumulative scroll friction without losing the pacing */
+@media (max-width: 540px) and (orientation: portrait) {
+  .beat--tall { min-height: 120vh; }
+  .beat--finale { min-height: 100vh; padding-bottom: 18vh; }
+  .drift { bottom: 8vh; }
+}
+
+/* =================================================================
+   REDUCED MOTION — a calm, static-friendly fallback
+   Everything still readable; ambient motion removed.
+   ================================================================= */
+@media (prefers-reduced-motion: reduce) {
+  .grain { animation: none; opacity: 0.03; }
+  .telemetry__dot { animation: none; opacity: 0.8; }
+  .scrollcue__line::after { animation: none; transform: translateY(0); height: 100%; opacity: 0.5; }
+  .webgl { transition: none; }
+
+  /* Reveal everything immediately — JS also short-circuits the timeline */
+  [data-reveal], .word__inner, .char__inner { opacity: 1 !important; transform: none !important; }
+  .word, .char { overflow: visible; }
+}
+
+/* Reduced-motion class set by JS for finer control (e.g. on the rail fill) */
+body.reduced .rail__fill { transition: height 0.3s linear; }
+
+/* =================================================================
+   THE DIVE CUE — "scroll down to dive into my universe"
+   The film's final invitation, written in its own language
+   (Inter whisper type, THE warm hue, breathing line + falling arrow).
+   ================================================================= */
+.dive-cue {
+  display: inline-block;
+  margin-top: 2.6rem;
+  font-family: var(--ui);
+  font-size: 0.66rem;
+  font-weight: 500;
+  letter-spacing: 0.34em;
+  text-indent: 0.34em;
+  text-transform: uppercase;
+  color: var(--warm);
+  text-shadow: 0 0 18px rgba(255, 179, 107, 0.35);
+  animation: dive-breathe 3.2s ease-in-out infinite;
+}
+@keyframes dive-breathe {
+  0%, 100% { opacity: 0.55; transform: translateY(0); }
+  50%      { opacity: 1;    transform: translateY(6px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dive-cue { animation: none; }
+}
