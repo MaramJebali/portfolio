@@ -530,7 +530,7 @@ export const projects: Project[] = [
     tags: ["Computer Vision", "RAG", "SDGs"],
     team: "Team SamSan · ESPRIT",
     award:
-      "Poster Session winner — presented at the MASSAI summer school (ESPRIT × NVIDIA)",
+      "Selected among the best of the poster session — Year-3 AI program, MASSAI summer school (ESPRIT × NVIDIA)",
     summary:
       "11 validated deep-learning models protecting Tunisia's 1,300 km coastline — biodiversity, aquaculture, surveillance — aligned with SDGs 2, 4, 12, 13, 14, 17.",
     problem: [
@@ -566,7 +566,7 @@ export const projects: Project[] = [
       },
     ],
     journey: [
-      "Won the poster session at the MASSAI AI summer school (ESPRIT × NVIDIA) — poster artwork coming soon to this case file.",
+      "Our project was selected among the best of the poster session — top of Year 3 of the AI program, presented at the MASSAI summer school (ESPRIT × NVIDIA).",
       "Developed at ESPRIT under the Challenge-Based Learning (CBL) methodology — datasets, models and satellite imagery used strictly for educational and research purposes.",
     ],
     stack: ["TensorFlow", "Keras", "PyTorch", "YOLOv5/8", "Faster R-CNN", "Mask R-CNN", "ByteTrack", "CNN14 (PANNs)", "Mistral", "LangChain", "FAISS", "OpenCV"],

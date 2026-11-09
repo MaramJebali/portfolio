@@ -118,10 +118,20 @@ export function ProjectModal({
   const awardImages = project
     ? [...getProjectMedia(slug, "award"), ...getProjectMedia(slug, "poster")]
     : [];
+  /* event shots (booth / corkboard / SDG wall) — Recognition only,
+     never the Screens gallery */
+  const eventImages = project
+    ? [
+        ...getProjectMedia(slug, "booth"),
+        ...getProjectMedia(slug, "sdg"),
+        ...getProjectMedia(slug, "corkboard"),
+      ]
+    : [];
+  const recognitionArt = [...awardImages, ...eventImages];
   const gallery = screens.filter(
     (s) =>
       !teamImages.includes(s) &&
-      !awardImages.includes(s) &&
+      !recognitionArt.includes(s) &&
       !/logo/i.test(s.split("/").pop() ?? ""),
   );
   const deck = project?.presentation ?? getProjectPdf(slug);
@@ -449,7 +459,7 @@ export function ProjectModal({
                 )}
 
                 {/* RECOGNITION — award artwork + the journey */}
-                {((awardImages.length > 0) ||
+                {((recognitionArt.length > 0) ||
                   project.award ||
                   (project.journey && project.journey.length > 0)) && (
                   <RevealSection eyebrow="Recognition" title="Wins & milestones">
@@ -461,14 +471,14 @@ export function ProjectModal({
                         </span>
                       </SplitBody>
                     )}
-                    {awardImages.length > 0 && (
+                    {recognitionArt.length > 0 && (
                       <div
                         className={cn(
                           "mt-10 grid gap-6",
-                          awardImages.length > 1 && "sm:grid-cols-2",
+                          recognitionArt.length > 1 && "sm:grid-cols-2",
                         )}
                       >
-                        {awardImages.map((src, i) => (
+                        {recognitionArt.map((src, i) => (
                           <motion.figure
                             key={src + i}
                             initial={{ y: 60, opacity: 0 }}
@@ -555,10 +565,9 @@ export function ProjectModal({
                   </div>
                 </RevealSection>
 
-                {/* TEAM — faces behind the project */}
-                {((project.contributors && project.contributors.length > 0) ||
-                  teamImages.length > 0 ||
-                  project.team) && (
+                {/* TEAM — faces behind the project (skip when there are
+                    no team images, e.g. Delil / FABMATE) */}
+                {teamImages.length > 0 && (
                   <RevealSection eyebrow="Crew" title="The people behind it">
                     <div className="mt-10 space-y-8">
                       {teamImages.length > 0 && (
