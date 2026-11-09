@@ -21,8 +21,8 @@ const NAV_ITEMS: NavItem[] = [
 ];
 
 const CV_OPTIONS = [
-  { lang: "en", label: "English", flag: "🇬🇧", href: "/cv-en.pdf", file: "Maram_Achraf_CV_EN.pdf" },
-  { lang: "fr", label: "Français", flag: "🇫🇷", href: "/cv-fr.pdf", file: "Maram_Achraf_CV_FR.pdf" },
+  { lang: "en", label: "English", flag: "🇬🇧", href: "/cv-en.pdf", file: "Maram_jebali_eng.pdf" },
+  { lang: "fr", label: "Français", flag: "🇫🇷", href: "/cv-fr.pdf", file: "Maram_jebali_fr.pdf" },
 ] as const;
 
 // Text tones — pass 4.5:1 on the dark capsule.

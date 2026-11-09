@@ -317,14 +317,14 @@ const CV_LANGUAGES = [
     label: "English",
     flag: "🇬🇧",
     href: "/cv-en.pdf",
-    file: "Maram_Achraf_CV_EN.pdf",
+    file: "Maram_jebali_eng.pdf",
   },
   {
     lang: "fr",
     label: "Français",
     flag: "🇫🇷",
     href: "/cv-fr.pdf",
-    file: "Maram_Achraf_CV_FR.pdf",
+    file: "Maram_jebali_fr.pdf",
   },
 ] as const;
 
