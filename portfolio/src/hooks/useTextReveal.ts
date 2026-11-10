@@ -55,5 +55,5 @@ export function useTextReveal<T extends HTMLElement = HTMLElement>({
     };
   }, [type, stagger, duration]);
 
-  return ref
+  return ref;
 }
