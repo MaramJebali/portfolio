@@ -1,15 +1,4 @@
 /* ==================================================================
-   Display font — Ed Benguiat Roman
-   ================================================================== */
-@font-face {
-  font-family: "Benguiat Roman";
-  src: url("/fonts/ed-benguiat-roman.woff2") format("woff2");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* ==================================================================
    Hide scrollbar for the horizontal track
    ================================================================== */
 .hide-scrollbar::-webkit-scrollbar {
