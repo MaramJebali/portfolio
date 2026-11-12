@@ -31,7 +31,8 @@ export const Route = createFileRoute("/universe")({
 });
 
 function Universe() {
-  const [active, setActive] = useState<SectionKey>("universe");
+  /* land directly on the About section (arriving from the intro film) */
+  const [active, setActive] = useState<SectionKey>("about");
   const [project, setProject] = useState<Project | null>(null);
 
   /* deep links like /universe#p-overdose open straight onto the projects scene */

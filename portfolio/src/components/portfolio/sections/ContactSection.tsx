@@ -34,18 +34,19 @@ export function ContactSection() {
     <div className="relative mx-auto flex min-h-[calc(100vh-4rem)] max-w-4xl flex-col items-center justify-center px-5 py-16 text-center sm:px-8">
       <div className="flex items-center gap-4 font-mono text-[0.7rem] uppercase tracking-[0.3em] text-muted-foreground">
         <span className="h-px w-10 bg-border" />
-        This is me, so far
+        Available for a PFE, January 2027
         <span className="h-px w-10 bg-border" />
       </div>
 
       <h2 className="mt-6 font-display text-5xl text-foreground text-glow sm:text-7xl">
-        Let&apos;s stay{" "}
-        <span className="italic text-foreground/60">connected</span>
+        Let&apos;s work <span className="italic text-foreground/60">together</span>
       </h2>
 
       <p className="mt-6 max-w-md text-sm leading-relaxed text-muted-foreground sm:text-base">
-        Got questions or want to collaborate? Feel free to reach out — I&apos;m
-        open to new projects, internships, or just a casual chat about AI.
+        I&apos;m looking for a{" "}
+        <strong className="text-foreground">6-month end-of-studies internship (PFE)</strong> in{" "}
+        <strong className="text-foreground">Data Science &amp; AI (R&amp;D)</strong>, starting{" "}
+        <strong className="text-foreground">January 2027</strong>.
       </p>
 
       <a
