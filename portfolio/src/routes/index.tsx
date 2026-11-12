@@ -29,6 +29,38 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
+/* ---------- Skip pill — the navbar's glass capsule, tuned for the film:
+   parked bottom-right (clear of the full-height scroll rail on the right),
+   always reachable above the preloader, rests quiet and wakes on hover. */
+function SkipPill({ onSkip }: { onSkip: () => void }) {
+  return (
+    <div
+      className="pointer-events-none fixed bottom-0 z-[120] flex justify-end pb-5 pr-5 sm:pb-6 sm:pr-7"
+      style={{ right: "clamp(2.6rem, 4.5vw, 3.4rem)" }}
+    >
+      <button
+        type="button"
+        onClick={onSkip}
+        aria-label="Skip the film and enter the universe"
+        className="skip-pill group pointer-events-auto flex cursor-pointer items-center gap-2 rounded-full border border-primary/50 bg-primary/15 px-8 py-3.5 font-mono text-xs uppercase tracking-[0.2em] text-foreground shadow-[var(--shadow-glow)] transition-colors hover:bg-primary/25"
+      >
+        <span className="text-xs uppercase tracking-[0.2em]">Skip</span>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={2}
+          stroke="currentColor"
+          className="h-4 w-4"
+          aria-hidden
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12l-7.5 7.5M21 12H3" />
+        </svg>
+      </button>
+    </div>
+  );
+}
+
 function Index() {
   const navigate = useNavigate();
   const rootRef = useRef<HTMLDivElement>(null);
@@ -69,6 +101,18 @@ function Index() {
 
   return (
     <div ref={rootRef} className="lwh-root">
+      {/* =========== SKIP PILL — navbar glass language, but tuned for the film:
+          appears after the preloader, rests quiet (dimmed, glow pulled back)
+          so it never competes with the opening shot, and wakes up on hover. */}
+      <SkipPill onSkip={() => {
+        try {
+          sessionStorage.setItem("lwh-arrival", "about");
+        } catch {
+          /* noop */
+        }
+        navigate({ to: "/universe" });
+      }} />
+
       {/* =========== PRELOADER =========== */}
       <div className="preloader" id="preloader" aria-hidden="true">
         <div className="preloader__inner">

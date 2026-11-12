@@ -24,3 +24,11 @@
 /* the violet card is fully opaque — never shows the scene background through it */
 .pjs-root .dk.v1{--card:none;background:linear-gradient(170deg,#ccdcf9,#f6dfec 60%,#f0d7ea);-webkit-backdrop-filter:none;backdrop-filter:none}
 .pjs-root .dk.v1 .plg{background:#f2f2f2;color:#00020f;border-color:rgba(0,2,15,.4)}
+
+/* taglines: fully readable — no line clamp, larger type, soft wrap.
+   The .pb is a column with pills pushed to the bottom, so longer text
+   simply grows between the title and the chips. Desktop only — mobile
+   keeps the original hidden-tagline layout. */
+@media (min-width: 901px) {
+  .pjs-root .dk .tg{display:block;-webkit-line-clamp:unset;overflow:visible;font-size:13.6px;line-height:1.5;max-width:none;letter-spacing:.01em}
+}

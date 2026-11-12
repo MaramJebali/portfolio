@@ -103,9 +103,12 @@ export function ProjectModal({
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     window.addEventListener("keydown", onKey);
     document.body.style.overflow = "hidden";
+    /* raise + frost the navbar above the modal */
+    document.body.classList.add("modal-open");
     return () => {
       window.removeEventListener("keydown", onKey);
       document.body.style.overflow = "";
+      document.body.classList.remove("modal-open");
     };
   }, [project, onClose]);
 

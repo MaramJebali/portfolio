@@ -43,7 +43,6 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { CertificationModal } from "@/components/portfolio/CertificationModal";
 import { StarField } from "@/components/portfolio/StarField";
-import ButtonCV from "@/components/ui/Button-cv";
 import type { SectionKey } from "@/components/portfolio/Navbar";
 import {
   SiPython,
@@ -87,16 +86,30 @@ import {
   SiVercel,
   SiRender,
   SiArduino,
+  SiHedera,
+  SiGithub,
 } from "react-icons/si";
-import { profile, certifications, experiences } from "@/data/portfolio";
+import {
+  profile,
+  certifications,
+  hederaCertifications,
+  experiences,
+} from "@/data/portfolio";
 import profileImage from "@/assets/profile.jpg";
+import sahhatekHome from "@/assets/projets/sahhatek/01-homes.jpg";
+import deepseaHome from "@/assets/projets/deepsea/01-home.jpg";
+import sahhatekTeam from "@/assets/projets/sahhatek/06-team.jpg";
+import deepseaTeam from "@/assets/projets/deepsea/07-team.jpg";
 import certif1 from "@/assets/certificates/certif6.png";
 import certif2 from "@/assets/certificates/certif5.png";
 import certif3 from "@/assets/certificates/certif4.png";
 import certif4 from "@/assets/certificates/certif3.png";
 import certif5 from "@/assets/certificates/certif2.png";
 import certif6 from "@/assets/certificates/certif1.png";
-import { HeroManifesto } from "@/components/ui/HeroManifesto";
+import hederaHbf from "@/assets/certificates/hedera-hbf.pdf";
+import hederaHcf from "@/assets/certificates/hedera-hcf.pdf";
+import hederaHcda from "@/assets/certificates/hedera-hcda.pdf";
+import { HeroManifesto, FlippingImagePill } from "@/components/ui/HeroManifesto";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -112,7 +125,13 @@ const certificationImages = [
   certif4,
   certif5,
   certif6,
+  hederaHcda,
+  hederaHbf,
+  hederaHcf,
 ];
+
+/* certification credentials shown in the modal, NVIDIA row + Hedera row */
+const allCertifications = [...certifications, ...hederaCertifications];
 
 const ABOUT_STARFIELD_OPACITY = 0.35;
 
@@ -952,6 +971,15 @@ function ExperienceList() {
 }
 
 /* ---------- Certification card — NVIDIA credential tile ---------- */
+
+/* NVIDIA brand green vs Hedera violet — per-issuer accents on cert cards */
+const HEDERA_VIOLET = "#8b5cf6";
+function certBrand(issuer: string) {
+  return /hashgraph|hedera/i.test(issuer)
+    ? { Icon: SiHedera, color: HEDERA_VIOLET, accent: "139,92,246" }
+    : { Icon: SiNvidia, color: NVIDIA_GREEN, accent: "118,185,0" };
+}
+
 function CertificationCard({
   cert,
   index,
@@ -966,6 +994,7 @@ function CertificationCard({
   const [isHovered, setIsHovered] = useState(false);
   const stamp = String(index + 1).padStart(2, "0");
   const totalStamp = String(total).padStart(2, "0");
+  const { Icon, color, accent } = certBrand(cert.issuer);
 
   return (
     <motion.button
@@ -982,11 +1011,11 @@ function CertificationCard({
       style={{
         backgroundImage: [GLASS_TINT, GLASS_BASE_CARD].join(", "),
         borderColor: isHovered
-          ? "rgba(118,185,0,0.45)"
+          ? `rgba(${accent},0.45)`
           : "rgba(255,255,255,0.14)",
         transform: isHovered ? "translateY(-4px)" : "translateY(0)",
         boxShadow: isHovered
-          ? "0 24px 55px -22px rgba(118,185,0,0.35), 0 1px 0 rgba(255,255,255,0.16) inset"
+          ? `0 24px 55px -22px rgba(${accent},0.35), 0 1px 0 rgba(255,255,255,0.16) inset`
           : "0 1px 0 rgba(255,255,255,0.10) inset",
       }}
     >
@@ -996,27 +1025,27 @@ function CertificationCard({
             className="grid h-11 w-11 place-items-center rounded-xl border transition-all duration-300"
             style={{
               borderColor: isHovered
-                ? "rgba(118,185,0,0.5)"
+                ? `rgba(${accent},0.5)`
                 : "rgba(255,255,255,0.14)",
               background: isHovered
-                ? "rgba(118,185,0,0.10)"
+                ? `rgba(${accent},0.10)`
                 : "rgba(255,255,255,0.03)",
               boxShadow: isHovered
-                ? "0 0 22px -8px rgba(118,185,0,0.75) inset"
+                ? `0 0 22px -8px rgba(${accent},0.75) inset`
                 : "none",
             }}
           >
-            <SiNvidia
+            <Icon
               className="h-6 w-6 transition-transform duration-300 motion-reduce:transition-none"
               style={{
-                color: NVIDIA_GREEN,
+                color: color,
                 transform: isHovered ? "scale(1.1)" : "scale(1)",
               }}
             />
           </span>
           <div className="leading-tight">
             <p className="font-mono text-[0.62rem] uppercase tracking-[0.26em] text-white/65">
-              NVIDIA
+              {cert.issuer === "NVIDIA" ? "NVIDIA" : "HASHGRAPH"}
             </p>
             <p className="mt-0.5 font-mono text-[0.55rem] uppercase tracking-[0.26em] text-white/35">
               Certificate
@@ -1037,7 +1066,7 @@ function CertificationCard({
         <p
           className="font-mono text-[0.58rem] uppercase tracking-[0.24em] transition-colors duration-300"
           style={{
-            color: isHovered ? "rgba(118,185,0,0.95)" : "rgba(255,255,255,0.45)",
+            color: isHovered ? `rgba(${accent},0.95)` : "rgba(255,255,255,0.45)",
           }}
         >
           View credential
@@ -1045,7 +1074,7 @@ function CertificationCard({
         <ArrowUpRight
           className="h-4 w-4 transition-all duration-300 motion-reduce:transition-none"
           style={{
-            color: isHovered ? NVIDIA_GREEN : "rgba(255,255,255,0.45)",
+            color: isHovered ? color : "rgba(255,255,255,0.45)",
             transform: isHovered
               ? "translate(2px, -2px)"
               : "translate(0, 0)",
@@ -1059,21 +1088,56 @@ function CertificationCard({
 /* ---------- Certification marquee row ---------- */
 function CertificationRow({
   items,
+  label,
   duration = 55,
   onSelect,
 }: {
   items: Certification[];
+  label: string;
   duration?: number;
   onSelect: (index: number) => void;
 }) {
   const doubled = [...items, ...items];
+  const brand = /hashgraph|hedera/i.test(items[0]?.issuer ?? "")
+    ? "139,92,246"
+    : "118,185,0";
 
   return (
     <div className="space-y-2" data-cert-row>
       <div className="flex items-center gap-2 px-1">
-        <h4 className="font-sans text-[0.95rem] font-semibold text-white select-none">
-          Credentials
-        </h4>
+        <div className="group/label relative">
+          <h4 className="cursor-help font-mono text-[0.8rem] font-semibold uppercase tracking-[0.14em] text-white select-none">
+            {label}
+          </h4>
+
+          {/* hover popup — count + certificate names */}
+          <div
+            role="tooltip"
+            className="pointer-events-none absolute left-0 top-full z-30 mt-2 w-max max-w-[280px] origin-top-left scale-95 rounded-xl border p-4 opacity-0 backdrop-blur-2xl transition-all duration-200 group-hover/label:scale-100 group-hover/label:opacity-100"
+            style={{
+              borderColor: `rgba(${brand},0.35)`,
+              backgroundImage: [GLASS_TINT, GLASS_BASE_CARD].join(", "),
+              boxShadow: `0 24px 55px -22px rgba(${brand},0.4), 0 1px 0 rgba(255,255,255,0.12) inset`,
+            }}
+          >
+            <p
+              className="font-mono text-[0.55rem] uppercase tracking-[0.26em]"
+              style={{ color: `rgba(${brand},0.95)` }}
+            >
+              {items.length} {items.length === 1 ? "certificate" : "certificates"}
+            </p>
+            <ul className="mt-2 space-y-1.5">
+              {items.map((cert) => (
+                <li
+                  key={cert.credentialId}
+                  className="font-display text-[0.85rem] italic leading-snug text-white/85"
+                >
+                  {cert.title}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
         <span
           className="flex-1 border-t"
           style={{ borderColor: "rgba(255,255,255,0.10)" }}
@@ -1106,6 +1170,121 @@ function CertificationRow({
 }
 
 /* ---------- CV menu ---------- */
+/* ---------- About manifesto — HeroManifesto design merged into the
+   About paragraph: bold sans words, blur/rise reveal, inline flipping
+   image pills anchored to the sentence's key ideas. ---------- */
+
+function MWord({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="manifesto-element inline-block mr-[0.18em] leading-[1.35] will-change-[transform,opacity,filter]">
+      {children}
+    </span>
+  );
+}
+
+const ABOUT_PILL_IMAGES = {
+  handsOn: [sahhatekHome, deepseaHome],
+  team: [sahhatekTeam, deepseaTeam],
+};
+
+function AboutManifesto() {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let ctx: gsap.Context | undefined;
+    const elements =
+      containerRef.current?.querySelectorAll(".manifesto-element") || [];
+
+    gsap.set(elements, { y: 28, opacity: 0, filter: "blur(10px)", scale: 0.97 });
+
+    const start = () => {
+      ctx = gsap.context(() => {
+        gsap.to(elements, {
+          y: 0,
+          opacity: 1,
+          filter: "blur(0px)",
+          scale: 1,
+          duration: 0.9,
+          stagger: 0.035,
+          ease: "power3.out",
+        });
+      }, containerRef);
+    };
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          start();
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.2 },
+    );
+    if (containerRef.current) observer.observe(containerRef.current);
+    const fallback = window.setTimeout(start, 2500);
+
+    return () => {
+      observer.disconnect();
+      window.clearTimeout(fallback);
+      ctx?.revert();
+    };
+  }, []);
+
+  const pill =
+    "h-9 w-14 sm:h-10 sm:w-16 md:h-12 md:w-[4.5rem] align-[-0.35em]";
+
+  return (
+    <div
+      ref={containerRef}
+      className="font-display text-[clamp(1.35rem,2.2vw,2rem)] leading-[1.45] text-white/88"
+    >
+      <MWord>Hi!</MWord>
+      <MWord>I</MWord>
+      <MWord>believe</MWord>
+      <MWord>that</MWord>
+      <MWord>I</MWord>
+      <MWord>thrive</MWord>
+      <MWord>when</MWord>
+      <MWord>tackling</MWord>
+      <FlippingImagePill images={ABOUT_PILL_IMAGES.handsOn} index={1} className={pill} />
+      <MWord>hands-on</MWord>
+      <MWord>projects</MWord>
+      <MWord>and</MWord>
+      <MWord>exploring</MWord>
+      <MWord>innovative</MWord>
+      <MWord>approaches</MWord>
+      <MWord>to</MWord>
+      <MWord>sustainability.</MWord>
+      <br className="hidden md:block" />
+      <MWord>I</MWord>
+      <MWord>am</MWord>
+      <MWord>eager</MWord>
+      <MWord>to</MWord>
+      <MWord>contribute</MWord>
+      <MWord>my</MWord>
+      <MWord>creativity,</MWord>
+      <MWord>technical</MWord>
+      <MWord>skills,</MWord>
+      <MWord>and</MWord>
+      <MWord>enthusiasm</MWord>
+      <MWord>to</MWord>
+      <FlippingImagePill images={ABOUT_PILL_IMAGES.team} index={3} className={pill} />
+      <MWord>collaborative</MWord>
+      <MWord>projects,</MWord>
+      <MWord>while</MWord>
+      <MWord>challenging</MWord>
+      <MWord>myself</MWord>
+      <MWord>to</MWord>
+      <MWord>grow</MWord>
+      <MWord>beyond</MWord>
+      <MWord>my</MWord>
+      <MWord>current</MWord>
+      <MWord>limits.</MWord>
+    </div>
+  );
+}
+
 function InlineCVMenu() {
   const [open, setOpen] = useState(false);
   const [status, setStatus] = useState<"idle" | "downloading" | "done">("idle");
@@ -1145,51 +1324,130 @@ function InlineCVMenu() {
     }, 500);
   };
 
+  const triggerBase =
+    "inline-flex min-h-[44px] cursor-pointer items-center gap-2.5 rounded-full border px-6 py-2.5 font-mono text-[0.8rem] font-semibold uppercase tracking-[0.14em] transition-all duration-300";
+
+  const pastel = {
+    backgroundImage:
+      "linear-gradient(170deg, #ccdcf9, #f6dfec 60%, #f0d7ea)",
+    borderColor: "rgba(10,13,28,0.22)",
+    color: "#0a0d1c",
+  };
+
   return (
-    <div ref={ref} className="relative inline-block">
-      <ButtonCV
-        status={status}
-        onClick={() => setOpen((v) => !v)}
-        aria-haspopup="menu"
-        aria-expanded={open}
-        trailing={
+    <div className="flex flex-wrap items-center gap-3">
+      <div ref={ref} className="relative z-30 inline-block">
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          aria-haspopup="menu"
+          aria-expanded={open}
+          className={`${triggerBase} hover:-translate-y-0.5`}
+          style={pastel}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.8}
+            stroke="currentColor"
+            className="h-4 w-4"
+            aria-hidden
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5"
+            />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
+            />
+          </svg>
+          {status === "downloading"
+            ? "Downloading…"
+            : status === "done"
+              ? "Downloaded"
+              : "Download CV"}
           <ChevronDown
             aria-hidden
             className={`h-4 w-4 transition-transform duration-300 ${
               open ? "rotate-180" : ""
             }`}
           />
-        }
-      />
+        </button>
 
-      {open && (
-        <div
-          role="menu"
-          className="absolute left-0 top-full z-20 mt-2 w-52 overflow-hidden rounded-2xl border backdrop-blur-2xl"
-          style={{
-            backgroundImage: [GLASS_TINT, GLASS_BASE_DEEP].join(", "),
-            borderColor: GLASS_BORDER,
-            boxShadow:
-              "0 22px 50px -22px rgba(0,0,0,0.7), 0 1px 0 rgba(255,255,255,0.18) inset",
-          }}
-        >
-          <p className="border-b border-white/10 px-4 py-2.5 font-sans text-[0.78rem] text-white/60">
-            Choose a language (PDF)
-          </p>
-          {CV_LANGUAGES.map((opt) => (
-            <button
-              key={opt.lang}
-              type="button"
-              role="menuitem"
-              onClick={() => download(opt)}
-              className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left font-sans text-[0.92rem] text-white/80 transition-colors hover:bg-white/[0.1] hover:text-white focus-visible:bg-white/[0.1] focus-visible:outline-none"
-            >
-              <span>{opt.label}</span>
-              <span aria-hidden>{opt.flag}</span>
-            </button>
-          ))}
-        </div>
-      )}
+        {open && (
+          <div
+            role="menu"
+            className="absolute left-0 top-full z-50 mt-2 w-60 overflow-hidden rounded-2xl border"
+            style={{
+              backgroundImage: pastel.backgroundImage,
+              borderColor: "rgba(10,13,28,0.22)",
+              boxShadow:
+                "0 24px 55px -22px rgba(10,13,28,0.55), inset 0 1px 0 rgba(255,255,255,0.5)",
+            }}
+          >
+            <p className="border-b border-[#0a0d1c]/10 px-4 py-2.5 font-mono text-[0.62rem] uppercase tracking-[0.2em] text-[#0a0d1c]/60">
+              Choose your CV language
+            </p>
+            {CV_LANGUAGES.map((opt) => (
+              <a
+                key={opt.lang}
+                role="menuitem"
+                href={opt.href}
+                download={opt.file}
+                onClick={(e) => {
+                  e.preventDefault();
+                  download(opt);
+                }}
+                className="flex w-full items-center justify-between gap-3 border-b border-[#0a0d1c]/5 px-4 py-3.5 text-left font-sans text-[0.95rem] text-[#0a0d1c]/85 transition-colors last:border-b-0 hover:bg-white/50 hover:text-[#0a0d1c] focus-visible:bg-white/50 focus-visible:outline-none"
+              >
+                <span className="flex items-center gap-2.5">
+                  <span aria-hidden className="text-base">{opt.flag}</span>
+                  <span className="font-semibold">{opt.label}</span>
+                  <span className="font-mono text-[0.6rem] uppercase tracking-[0.18em] text-[#0a0d1c]/45">
+                    CV · {opt.lang.toUpperCase()}
+                  </span>
+                </span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.8}
+                  stroke="currentColor"
+                  className="h-4 w-4 text-[#0a0d1c]/60"
+                  aria-hidden
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
+                  />
+                </svg>
+              </a>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <a
+        href={profile.contact.github}
+        target="_blank"
+        rel="noreferrer"
+        className={`${triggerBase} hover:-translate-y-0.5`}
+        style={pastel}
+        aria-label="Open GitHub profile"
+      >
+        <SiGithub className="h-4 w-4" aria-hidden />
+        GitHub
+      </a>
     </div>
   );
 }
@@ -1345,14 +1603,11 @@ export function AboutSection({
               </span>
             </NameHeading>
 
-            <p
-              data-cascade
-              className="mt-8 max-w-[58ch] font-display text-2xl leading-[1.35] text-white/88 sm:text-[1.75rem] md:text-[2rem] md:leading-[1.3]"
-            >
-              {profile.about}
-            </p>
+            <div data-cascade className="mt-8 max-w-[58ch]">
+              <AboutManifesto />
+            </div>
 
-            <div data-cascade className="mt-10">
+            <div data-cascade className="relative z-30 mt-10">
               <InlineCVMenu />
             </div>
 
@@ -1432,19 +1687,26 @@ export function AboutSection({
           <SectionHeading
             lead="Certifications"
             accent="& credentials"
-            sub="NVIDIA-issued certificates. Select one to view the full credential."
+            sub="NVIDIA and Hashgraph-issued certificates. Select one to view the full credential."
           />
-          <div className="relative mt-10">
+          <div className="relative mt-10 space-y-10">
             <CertificationRow
               items={certifications}
+              label="AI & Deep Learning"
               duration={55}
               onSelect={setSelectedCertIndex}
+            />
+            <CertificationRow
+              items={hederaCertifications}
+              label="Blockchain & Hedera"
+              duration={65}
+              onSelect={(i) => setSelectedCertIndex(certifications.length + i)}
             />
           </div>
         </section>
 
         <CertificationModal
-          certifications={certifications}
+          certifications={allCertifications}
           images={certificationImages}
           currentIndex={selectedCertIndex}
           onClose={() => setSelectedCertIndex(null)}

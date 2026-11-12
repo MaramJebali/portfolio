@@ -65,9 +65,12 @@ export function CertificationModal({
     };
     window.addEventListener("keydown", onKey);
     document.body.style.overflow = "hidden";
+    /* frost the navbar while a modal is open (it stays beneath the modal) */
+    document.body.classList.add("modal-open");
     return () => {
       window.removeEventListener("keydown", onKey);
       document.body.style.overflow = "";
+      document.body.classList.remove("modal-open");
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, currentIndex]);
@@ -124,7 +127,16 @@ export function CertificationModal({
               
             </div>
 
-            {image && (
+            {image && image.endsWith(".pdf") ? (
+              <div className="mt-4 overflow-hidden rounded-2xl border border-border/40 bg-black/40">
+                <iframe
+                  src={`${image}#view=FitH`}
+                  title={cert.title}
+                  loading="lazy"
+                  className="h-[55vh] w-full bg-white/5"
+                />
+              </div>
+            ) : image ? (
               <div className="mt-4 overflow-hidden rounded-2xl border border-border/40 bg-black/40">
                 <img
                   src={image}
@@ -132,7 +144,7 @@ export function CertificationModal({
                   className="h-auto max-h-[55vh] w-full object-contain"
                 />
               </div>
-            )}
+            ) : null}
 
             <h2 className="mt-6 font-display text-2xl leading-tight text-foreground sm:text-3xl">
               {cert.title}

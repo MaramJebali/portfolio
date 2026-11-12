@@ -50,7 +50,9 @@ export function ContactSection() {
       </p>
 
       <a
-        href={`mailto:${profile.contact.email}`}
+        href={`mailto:${profile.contact.email}?subject=${encodeURIComponent(
+          "PFE Internship — Contact from your portfolio"
+        )}`}
         className="mt-9 inline-flex items-center gap-2 rounded-full border border-primary/50 bg-primary/15 px-8 py-3.5 font-mono text-xs uppercase tracking-[0.2em] text-foreground shadow-[var(--shadow-glow)] transition-colors hover:bg-primary/25"
       >
         <Mail className="h-4 w-4" /> Contact me

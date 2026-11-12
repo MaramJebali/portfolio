@@ -24,12 +24,14 @@ const Word = ({
   </span>
 );
 
-const FlippingImagePill = ({
+export const FlippingImagePill = ({
   images,
   index = 0,
+  className,
 }: {
   images: string[];
   index?: number;
+  className?: string;
 }) => {
   const innerRef = useRef<HTMLDivElement>(null);
   const rotationTarget = useRef(0);
@@ -72,6 +74,7 @@ const FlippingImagePill = ({
     <span
       className={cn(
         "manifesto-element h-11 w-16 md:h-14 md:w-20 inline-block align-middle mx-[0.12em] relative will-change-[transform,opacity,filter]",
+        className,
       )}
     >
       <div

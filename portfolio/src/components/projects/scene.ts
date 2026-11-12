@@ -188,7 +188,10 @@ export function mountScene(
       if (v.bottom > -VH && v.top < VH * 2) {
         RECT = { rf: fw1.getBoundingClientRect(), rl: flp.getBoundingClientRect(), sr: stg.getBoundingClientRect() };
         const n = cl(-v.top / s, 0, UN);
-        deckT += (n - deckT) * .22;
+        /* gentler catch-up: under fast scrolling the deck glides to its
+           target instead of snapping, so the hand-off into the list below
+           reads as one smooth motion */
+        deckT += (n - deckT) * .11;
         const u = DIMS.W, d = DIMS.H, p = DIMS.cw, h = cl(deckT / 1.2),
           x = cl(deckT - 1.2, 0, N - 1), b = d * .13, f = ss(h / .3),
           y = ss((h - .68) / .3), g = ss(1 - v.top / s),

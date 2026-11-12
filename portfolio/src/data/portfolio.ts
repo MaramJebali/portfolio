@@ -148,8 +148,7 @@ export type Certification = {
   image?: string;
 };
 
-export const certifications: Certification[] = [
-  {
+export const certifications: Certification[] = [  {
     title: "Building Transformer-Based Natural Language Processing Applications",
     issuer: "NVIDIA",
     issued: "Mar 2026",
@@ -190,6 +189,30 @@ export const certifications: Certification[] = [
     issued: "Jan 2024",
     credentialId: "1tO0Ys3ITkGJkXM3sgBKrQ",
     image: "/src/assets/certificates/certif1.png",
+  },
+];
+
+export const hederaCertifications: Certification[] = [
+  {
+    title: "Hedera Certified Developer Associate (HCDA)",
+    issuer: "The Hashgraph Association",
+    issued: "Nov 2026",
+    credentialId: "495f20c9-a1ac-4fe3-a20b-5448a4c56385",
+    image: "/src/assets/certificates/hedera-hcda.pdf",
+  },
+  {
+    title: "Hedera Business Foundation (HBF)",
+    issuer: "The Hashgraph Association",
+    issued: "Nov 2026",
+    credentialId: "3fea5be5-1106-43dd-9885-0170becf3705",
+    image: "/src/assets/certificates/hedera-hbf.pdf",
+  },
+  {
+    title: "Hedera Certified Foundation (HCF)",
+    issuer: "The Hashgraph Association",
+    issued: "Nov 2026",
+    credentialId: "1f433707-2a84-4165-9508-1a0b82ace2bf",
+    image: "/src/assets/certificates/hedera-hcf.pdf",
   },
 ];
 

@@ -117,7 +117,7 @@ export function Navbar({
   return (
     <header
       ref={headerRef}
-      className="pointer-events-none fixed right-0 top-0 z-50 flex justify-end pr-4 pt-4 sm:pr-6 sm:pt-5"
+      className="site-nav pointer-events-none fixed right-0 top-0 z-50 flex justify-end pr-4 pt-4 sm:pr-6 sm:pt-5"
     >
       {/* the capsule stays fixed at its position while scrolling */}
       <div>
