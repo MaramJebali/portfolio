@@ -12,6 +12,7 @@ import {
   getProjectPdf,
   type Project,
 } from "@/data/portfolio";
+import { getLang } from "@/lib/lang";
 
 export type SceneProject = {
   /* deck / index data */
@@ -51,10 +52,10 @@ function firstSentence(text: string, cap = 92): string {
 }
 
 /* up to four bullet points for the deck card's highlight list */
-function cardBullets(p: Project): string[] {
-  if (p.description && p.description.length)
-    return p.description.slice(0, 4).map((t) => firstSentence(t, 110));
-  return firstSentences(p.summary, 4);
+function cardBullets(p: Project, fr: boolean): string[] {
+  const d = (fr && p.descriptionFr) || p.description;
+  if (d && d.length) return d.slice(0, 4).map((t) => firstSentence(t, 110));
+  return firstSentences((fr && p.summaryFr) || p.summary, 4);
 }
 
 function firstSentences(text: string, n: number): string[] {
@@ -66,31 +67,42 @@ function firstSentences(text: string, n: number): string[] {
 }
 
 export function toSceneProjects(list: Project[]): SceneProject[] {
+  const fr = getLang() === "fr";
+  const summary = (p: Project) => (fr && p.summaryFr) || p.summary;
   return list.map((p) => {
     const screens = getProjectScreens(p.slug ?? p.id);
-    const bullets = cardBullets(p);
+    const bullets = cardBullets(p, fr);
+    const metrics =
+      (fr && p.metricsFr) ||
+      p.metrics ||
+      (p.award
+        ? [
+            {
+              label: fr ? "Reconnaissance" : "Recognition",
+              value: (fr && p.awardFr) || p.award,
+            },
+          ]
+        : []);
     return {
       slug: p.slug ?? p.id,
       title: p.title,
-      tagline: firstSentence(p.summary),
-      blurb: p.summary,
+      tagline: firstSentence(summary(p)),
+      blurb: summary(p),
       tags: (p.stack.length ? p.stack : p.tags).slice(0, 6),
-      category: categoryMeta[p.category].label,
+      category: (fr && categoryMeta[p.category].labelFr) || categoryMeta[p.category].label,
       period: p.period ?? "",
-      bullets: bullets.length ? bullets : [p.summary],
+      bullets: bullets.length ? bullets : [summary(p)],
 
-      summary: p.summary,
-      description: p.description ?? [],
-      problem: p.problem ?? [],
-      solution: p.solution ?? [],
-      features: p.features ?? [],
-      journey: p.journey ?? [],
-      metrics:
-        p.metrics ??
-        (p.award ? [{ label: "Recognition", value: p.award }] : []),
+      summary: summary(p),
+      description: ((fr && p.descriptionFr) || p.description) ?? [],
+      problem: ((fr && p.problemFr) || p.problem) ?? [],
+      solution: ((fr && p.solutionFr) || p.solution) ?? [],
+      features: ((fr && p.featuresFr) || p.features) ?? [],
+      journey: ((fr && p.journeyFr) || p.journey) ?? [],
+      metrics,
       stack: p.stack,
       team: p.team,
-      award: p.award,
+      award: (fr && p.awardFr) || p.award,
       contributors: p.contributors,
       screens,
       cover: screens[0],

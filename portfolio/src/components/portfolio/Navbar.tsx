@@ -9,20 +9,21 @@ import { ChevronDown, Menu, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/lib/utils";
+import { useLang } from "@/lib/lang";
 
 export type SectionKey = "universe" | "about" | "works" | "contact";
 
-type NavItem = { key: SectionKey; label: string };
+type NavItem = { key: SectionKey; label: string; labelFr: string };
 
 const NAV_ITEMS: NavItem[] = [
-  { key: "about", label: "About" },
-  { key: "works", label: "Work" },
-  { key: "contact", label: "Contact" },
+  { key: "about", label: "About", labelFr: "À propos" },
+  { key: "works", label: "Work", labelFr: "Projets" },
+  { key: "contact", label: "Contact", labelFr: "Contact" },
 ];
 
 const CV_OPTIONS = [
-  { lang: "en", label: "English", flag: "🇬🇧", href: "/cv-en.pdf", file: "Maram_jebali_eng.pdf" },
-  { lang: "fr", label: "Français", flag: "🇫🇷", href: "/cv-fr.pdf", file: "Maram_jebali_fr.pdf" },
+  { lang: "en", label: "English", labelFr: "Anglais", flag: "🇬🇧", href: "/cv-en.pdf", file: "Maram_jebali_eng.pdf" },
+  { lang: "fr", label: "Français", labelFr: "Français", flag: "🇫🇷", href: "/cv-fr.pdf", file: "Maram_jebali_fr.pdf" },
 ] as const;
 
 // Text tones — pass 4.5:1 on the dark capsule.
@@ -114,6 +115,7 @@ export function Navbar({
     setOpen(false);
   };
 
+  const lang = useLang();
   return (
     <header
       ref={headerRef}
@@ -137,7 +139,7 @@ export function Navbar({
               <div key={item.key} className="flex items-center">
                 {i > 0 && <Rule />}
                 <NavLink
-                  label={item.label}
+                  label={lang === "fr" ? item.labelFr : item.label}
                   isActive={active === item.key}
                   onClick={() => onChange(item.key)}
                 />
@@ -187,7 +189,7 @@ export function Navbar({
                       className="border-b border-white/10 px-4 py-2.5 font-sans text-[0.78rem]"
                       style={{ color: TEXT_FAINT }}
                     >
-                      Download CV (PDF)
+                      {lang === "fr" ? "Télécharger le CV (PDF)" : "Download CV (PDF)"}
                     </p>
                     {CV_OPTIONS.map((opt) => (
                       <button
@@ -198,7 +200,7 @@ export function Navbar({
                         className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left font-sans text-[0.9rem] transition-colors hover:bg-white/[0.10] focus-visible:bg-white/[0.10] focus-visible:outline-none"
                         style={{ color: TEXT_SOFT }}
                       >
-                        <span>{opt.label}</span>
+                        <span>{lang === "fr" ? opt.labelFr : opt.label}</span>
                         <span aria-hidden>{opt.flag}</span>
                       </button>
                     ))}
@@ -263,7 +265,7 @@ export function Navbar({
                     color: active === item.key ? TEXT_BRIGHT : TEXT_SOFT,
                   }}
                 >
-                  {item.label}
+                  {lang === "fr" ? item.labelFr : item.label}
                 </button>
               ))}
 
@@ -272,7 +274,7 @@ export function Navbar({
                   className="mb-1 font-sans text-[0.8rem]"
                   style={{ color: TEXT_FAINT }}
                 >
-                  Download CV (PDF)
+                  {lang === "fr" ? "Télécharger le CV (PDF)" : "Download CV (PDF)"}
                 </p>
                 {CV_OPTIONS.map((opt) => (
                   <button
@@ -285,7 +287,7 @@ export function Navbar({
                     )}
                     style={{ color: TEXT_SOFT }}
                   >
-                    <span>{opt.label}</span>
+                    <span>{lang === "fr" ? opt.labelFr : opt.label}</span>
                     <span aria-hidden>{opt.flag}</span>
                   </button>
                 ))}

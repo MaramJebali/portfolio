@@ -11,6 +11,7 @@
      100% ≤900px) because the ported stylesheet is px-normalised      */
 
 import type { SceneProject } from "./mapData";
+import { getLang } from "@/lib/lang";
 
 export type SceneHandle = { dispose: () => void };
 
@@ -24,6 +25,7 @@ export function mountScene(
   projects: SceneProject[],
 ): SceneHandle {
   const N = projects.length;
+  const LANG = { fr: getLang() === "fr" };
   const pad = (n: number) => String(n + 1).padStart(2, "0");
   const chip = (name: string) => `<span><span class="mono">${name.slice(0, 2)}</span>${name}</span>`;
 
@@ -50,7 +52,7 @@ export function mountScene(
       <div class="pb"><div class="lab">${pad(i)} · ${p.category}${p.period ? " · " + p.period : ""}</div>
       <h3 class="d">${p.title}</h3><p class="tg">${p.tagline}</p>
       <div class="chips">${p.tags.map(chip).join("")}</div>
-      <div class="pr"><a class="pill" data-case="${p.slug}" href="#p-${p.slug}">View project →</a>${
+      <div class="pr"><a class="pill" data-case="${p.slug}" href="#p-${p.slug}">${LANG.fr ? "Voir le projet" : "View project"} →</a>${
         p.github ? ` <a class="pill" target="_blank" rel="noopener" href="${p.github}">GitHub ↗</a>` : ""
       }</div></div></article>`;
   }).join("");
@@ -67,10 +69,12 @@ export function mountScene(
     span.innerHTML = [...span.textContent].map(c =>
       `<i style="--d:${ld++ * 45}">${c === " " ? "\u00a0" : c}</i>`).join("");
   });
-  $(".fp", root).textContent = `${N} projects`;
+  $(".fp", root).textContent = LANG.fr ? `${N} projets` : `${N} projects`;
 
   /* full-list rows (pidx) */
-  pidx.innerHTML = '<div class="lab">All projects · click any row</div>' +
+  pidx.innerHTML = (LANG.fr
+    ? '<div class="lab">Tous les projets · cliquez sur une ligne</div>'
+    : '<div class="lab">All projects · click any row</div>') +
     projects.map((p, i) =>
       `<a class="pn2" data-cat="${p.category}" data-case="${p.slug}" href="#p-${p.slug}"><span class="lab">${pad(i)}</span>
         <span class="d nm">${p.title}</span>
@@ -83,7 +87,7 @@ export function mountScene(
   pfx.className = "pfx";
   const cats = ["all", ...Array.from(new Set(projects.map(p => p.category)))];
   pfx.innerHTML = cats.map(c =>
-    `<button type="button" class="pf${c === "all" ? " on" : ""}" data-f="${c}">${c === "all" ? "All" : c}</button>`).join("");
+    `<button type="button" class="pf${c === "all" ? " on" : ""}" data-f="${c}">${c === "all" ? (LANG.fr ? "Tous" : "All") : c}</button>`).join("");
   pidx.prepend(pfx);
   const rows = Array.from(pidx.querySelectorAll<HTMLElement>(".pn2"));
   const applyFilter = () => {

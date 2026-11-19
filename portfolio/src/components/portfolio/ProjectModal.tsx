@@ -24,6 +24,7 @@ import {
   toEmbedUrl,
 } from "@/data/portfolio";
 import { cn } from "@/lib/utils";
+import { useLang } from "@/lib/lang";
 import { findTechIcon } from "./techIcon";
 import { SplitReveal } from "@/components/ui/splitReveal";
 
@@ -40,6 +41,7 @@ export function ProjectModal({
   project: Project | null;
   onClose: () => void;
 }) {
+  const fr = useLang() === "fr";
   const scrollRef = useRef<HTMLDivElement>(null);
   const [railH, setRailH] = useState(0);
 
@@ -140,19 +142,19 @@ export function ProjectModal({
   const deck = project?.presentation ?? getProjectPdf(slug);
   const embed = project ? toEmbedUrl(project.video) : undefined;
 
-  type LinkItem = { label: string; href?: string; icon: typeof Github };
+  type LinkItem = { label: string; labelFr?: string; href?: string; icon: typeof Github };
   const links: LinkItem[] = project
     ? [
-        { label: "GitHub", href: project.github, icon: Github },
+        { label: "GitHub", labelFr: "GitHub", href: project.github, icon: Github },
         ...((project.extraLinks ?? []).map((l) => ({
           label: l.label,
           href: l.href,
           icon: Github,
         })) as LinkItem[]),
-        { label: "Live site", href: project.live, icon: ExternalLink },
-        { label: "Demo", href: project.demo, icon: Play },
-        { label: "Video", href: project.video, icon: Play },
-        { label: "Project page", href: project.link, icon: ArrowUpRight },
+        { label: "Live site", labelFr: "Site en ligne", href: project.live, icon: ExternalLink },
+        { label: "Demo", labelFr: "Démo", href: project.demo, icon: Play },
+        { label: "Video", labelFr: "Vidéo", href: project.video, icon: Play },
+        { label: "Project page", labelFr: "Page du projet", href: project.link, icon: ArrowUpRight },
       ].filter((l) => Boolean(l.href))
     : [];
 
@@ -214,7 +216,8 @@ export function ProjectModal({
               >
                 <div className="p-8 sm:p-12">
                   <span className="block font-mono text-[0.65rem] uppercase tracking-[0.3em] text-violet-glow">
-                    Case file · {project.period ?? project.category}
+                    {fr ? "Dossier · " : "Case file · "}
+                    {project.period ?? project.category}
                   </span>
 
                   <h1 className="mt-5 font-display text-5xl leading-[0.95] text-white text-glow sm:text-6xl">
@@ -242,7 +245,7 @@ export function ProjectModal({
 
                   {(links.length > 0 || deck) && (
                     <div className="mt-12 flex flex-col gap-3">
-                      {links.map(({ label, href, icon: Icon }) => (
+                      {links.map(({ label, labelFr: lf, href, icon: Icon }) => (
                         <a
                           key={label}
                           href={href!}
@@ -252,7 +255,7 @@ export function ProjectModal({
                         >
                           <span className="flex items-center gap-3">
                             <Icon className="h-4 w-4 text-white/50 transition-colors group-hover:text-white" /> 
-                            {label}
+                            {fr && lf ? lf : label}
                           </span>
                           <ArrowUpRight className="h-4 w-4 text-white/30 transition-all group-hover:translate-x-1 group-hover:-translate-y-1 group-hover:text-white" />
                         </a>
@@ -292,7 +295,7 @@ export function ProjectModal({
                 
                 {/* OVERVIEW — for projects written as story, not problem/solution */}
                 {(!project.problem && project.description && project.description.length > 0) && (
-                  <RevealSection eyebrow="01 — Story" title="What it is">
+                  <RevealSection eyebrow="01 — Story" title={fr ? "De quoi il s'agit" : "What it is"}>
                     {project.description.map((d, i) => (
                       <SplitBody key={i}>{d}</SplitBody>
                     ))}
@@ -301,7 +304,7 @@ export function ProjectModal({
 
                 {/* PROBLEM */}
                 {project.problem && project.problem.length > 0 && (
-                  <RevealSection eyebrow="01 — Problem" title="The blind spot">
+                  <RevealSection eyebrow="01 — Problem" title={fr ? "L'angle mort" : "The blind spot"}>
                     {project.problem.map((p, i) => (
                       <SplitBody key={i}>{p}</SplitBody>
                     ))}
@@ -310,7 +313,7 @@ export function ProjectModal({
 
                 {/* SOLUTION */}
                 {project.solution && project.solution.length > 0 && (
-                  <RevealSection eyebrow="02 — Solution" title="What we built">
+                  <RevealSection eyebrow="02 — Solution" title={fr ? "Ce que nous avons construit" : "What we built"}>
                     {project.solution.map((p, i) => (
                       <SplitBody key={i}>{p}</SplitBody>
                     ))}
@@ -319,7 +322,7 @@ export function ProjectModal({
 
                 {/* FEATURES — cxf cut-panels: sticky text, wider image rail */}
                 {project.features && project.features.length > 0 && (
-                  <RevealSection eyebrow="03 — Features" title="Under the hood">
+                  <RevealSection eyebrow="03 — Features" title={fr ? "Sous le capot" : "Under the hood"}>
                     <div className="mt-12 space-y-14">
                       {project.features.map((f, i) => {
                         const img =
@@ -402,7 +405,7 @@ export function ProjectModal({
 
                 {/* VIDEO */}
                 {project.video && (
-                  <RevealSection eyebrow="Explainer" title="Watch it in motion">
+                  <RevealSection eyebrow={fr ? "Explication" : "Explainer"} title={fr ? "Regardez-la en action" : "Watch it in motion"}>
                     <div className="mt-10 overflow-hidden rounded-3xl border border-black/10 bg-black shadow-2xl">
                       {embed ? (
                         <div className="relative aspect-video">
@@ -425,7 +428,7 @@ export function ProjectModal({
 
                 {/* GALLERY — screenshot wall (pj-sh) */}
                 {gallery.length > 0 && (
-                  <RevealSection eyebrow="Visual feed" title="Screens from the build">
+                  <RevealSection eyebrow={fr ? "Flux visuel" : "Visual feed"} title={fr ? "Écrans du projet" : "Screens from the build"}>
                     <div className="mt-10 grid gap-6 sm:grid-cols-2">
                       {gallery.map((src, k) => (
                         <motion.figure
@@ -465,7 +468,7 @@ export function ProjectModal({
                 {((recognitionArt.length > 0) ||
                   project.award ||
                   (project.journey && project.journey.length > 0)) && (
-                  <RevealSection eyebrow="Recognition" title="Wins & milestones">
+                  <RevealSection eyebrow={fr ? "Reconnaissance" : "Recognition"} title={fr ? "Réussites & jalons" : "Wins & milestones"}>
                     {project.award && (
                       <SplitBody>
                         <span className="inline-flex items-start gap-3 text-[#00020F]">
@@ -530,13 +533,13 @@ export function ProjectModal({
 
                 {/* RESULTS — cxn KPI stats */}
                 {project.metrics && project.metrics.length > 0 && (
-                  <RevealSection eyebrow="Results" title="By the numbers">
+                  <RevealSection eyebrow={fr ? "Résultats" : "Results"} title={fr ? "En chiffres" : "By the numbers"}>
                     <Metrics metrics={project.metrics} />
                   </RevealSection>
                 )}
 
                 {/* STACK — cxk tiles with brand logos */}
-                <RevealSection eyebrow="Stack" title="Built with">
+                <RevealSection eyebrow="Stack" title={fr ? "Construit avec" : "Built with"}>
                   <div className="mt-10 grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
                     {project.stack.map((s) => {
                       const Icon = findTechIcon(s);
@@ -571,7 +574,7 @@ export function ProjectModal({
                 {/* TEAM — faces behind the project (skip when there are
                     no team images, e.g. Delil / FABMATE) */}
                 {teamImages.length > 0 && (
-                  <RevealSection eyebrow="Crew" title="The people behind it">
+                  <RevealSection eyebrow={fr ? "Équipe" : "Crew"} title={fr ? "Les personnes derrière" : "The people behind it"}>
                     <div className="mt-10 space-y-8">
                       {teamImages.length > 0 && (
                         <div
@@ -633,7 +636,7 @@ export function ProjectModal({
                     className="group inline-flex items-center gap-3 font-mono text-[0.7rem] uppercase tracking-[0.2em] text-black/45 transition-colors hover:text-black"
                   >
                     <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-                    All projects
+                    {fr ? "Tous les projets" : "All projects"}
                   </button>
                   <span className="inline-flex items-center gap-2 font-mono text-[0.6rem] uppercase tracking-[0.2em] text-black/25">
                     <Rocket className="h-4 w-4" /> {project.title}

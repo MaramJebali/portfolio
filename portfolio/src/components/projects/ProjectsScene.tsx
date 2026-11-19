@@ -10,6 +10,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { projects as sourceProjects, type Project } from "@/data/portfolio";
 import { toSceneProjects } from "./mapData";
 import { mountScene, type SceneHandle } from "./scene";
+import { useLang } from "@/lib/lang";
 import "./scene.css";
 
 export function ProjectsScene({
@@ -17,6 +18,7 @@ export function ProjectsScene({
 }: {
   onOpenProject?: (p: Project) => void;
 }) {
+  const lang = useLang();
   const rootRef = useRef<HTMLDivElement>(null);
   const openRef = useRef(onOpenProject);
   openRef.current = onOpenProject;
@@ -33,7 +35,8 @@ export function ProjectsScene({
     const list = toSceneProjects(sourceProjects).filter(p => !HIDDEN.has(p.slug));
     /* projects with a live GitHub repo lead the deck */
     return [...list.filter(p => p.github), ...list.filter(p => !p.github)];
-  }, []);
+    /* re-map when the language changes so the deck rebuilds in the new language */
+  }, [lang]);
 
   useEffect(() => {
     const root = rootRef.current;

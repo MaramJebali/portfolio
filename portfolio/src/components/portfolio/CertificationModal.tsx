@@ -1,6 +1,7 @@
 import { motion, AnimatePresence, type PanInfo } from "motion/react";
 import { X, BadgeCheck, ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect } from "react";
+import { useLang } from "@/lib/lang";
 
 type CertificationItem = {
   title: string;
@@ -24,6 +25,7 @@ export function CertificationModal({
 }) {
   const isOpen = currentIndex !== null;
   const total = certifications.length;
+  const fr = useLang() === "fr";
   const cert = isOpen ? certifications[currentIndex] : null;
   const image = isOpen ? images[currentIndex] ?? images[0] : null;
 
@@ -122,7 +124,7 @@ export function CertificationModal({
 
             <div className="flex items-center justify-between gap-3">
               <span className="font-mono text-[0.65rem] uppercase tracking-[0.25em] text-violet-glow">
-                Credential {currentIndex! + 1} / {total}
+                {fr ? "Certificat" : "Credential"} {currentIndex! + 1} / {total}
               </span>
               
             </div>
@@ -167,13 +169,13 @@ export function CertificationModal({
                   onClick={goPrev}
                   className="inline-flex flex-1 items-center justify-center gap-2 rounded-full border border-border px-4 py-2.5 font-mono text-xs uppercase tracking-[0.15em] text-foreground transition-colors hover:bg-secondary"
                 >
-                  <ChevronLeft className="h-3.5 w-3.5" /> Prev
+                  <ChevronLeft className="h-3.5 w-3.5" /> {fr ? "Préc." : "Prev"}
                 </button>
                 <button
                   onClick={goNext}
                   className="inline-flex flex-1 items-center justify-center gap-2 rounded-full border border-border px-4 py-2.5 font-mono text-xs uppercase tracking-[0.15em] text-foreground transition-colors hover:bg-secondary"
                 >
-                  Next <ChevronRight className="h-3.5 w-3.5" />
+                  {fr ? "Suiv." : "Next"} <ChevronRight className="h-3.5 w-3.5" />
                 </button>
               </div>
             )}

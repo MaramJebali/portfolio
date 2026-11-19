@@ -11,6 +11,7 @@
 
 import type { SceneProject } from "./mapData";
 import { detailState } from "./scene";
+import { getLang } from "@/lib/lang";
 
 const $ = (sel: string, el: ParentNode) => el.querySelector(sel) as HTMLElement;
 
@@ -83,6 +84,7 @@ export function mountDetail(
 
   /* ---------- data-driven body ---------- */
   function body(p: SceneProject, i: number): string {
+    const LANG = { fr: getLang() === "fr" };
     const out: string[] = [];
     let n = 0;
     const num = () => pad2(n++);
@@ -90,38 +92,38 @@ export function mountDetail(
 
     /* overview — glass column pair */
     if (p.description.length) {
-      out.push(`<div class="pj-s">${sec(num(), "Overview")}
-        <div class="d pj-h">What it is</div>
+      out.push(`<div class="pj-s">${sec(num(), LANG.fr ? "Aperçu" : "Overview")}
+        <div class="d pj-h">${LANG.fr ? "De quoi il s'agit" : "What it is"}</div>
         ${p.description.length >= 2 ? `<div class="pj-g">
-          <div class="cy cyb"><div class="cyi"><span class="lab">The project</span><p>${esc(p.description[0])}</p></div></div>
-          <div class="cy cyb"><div class="cyi"><span class="lab">The details</span>${p.description.slice(1).map(t => `<p>${esc(t)}</p>`).join("")}</div></div>
+          <div class="cy cyb"><div class="cyi"><span class="lab">${LANG.fr ? "Le projet" : "The project"}</span><p>${esc(p.description[0])}</p></div></div>
+          <div class="cy cyb"><div class="cyi"><span class="lab">${LANG.fr ? "Les détails" : "The details"}</span>${p.description.slice(1).map(t => `<p>${esc(t)}</p>`).join("")}</div></div>
         </div>` : `<p class="rt" style="max-width:60rem">${esc(p.description[0])}</p>`}
       </div>`);
     }
 
     /* problem — callout notes */
     if (p.problem.length) {
-      out.push(`<div class="pj-s">${sec(num(), "Problem")}
-        <div class="d pj-h">Why it matters</div>
+      out.push(`<div class="pj-s">${sec(num(), LANG.fr ? "Problème" : "Problem")}
+        <div class="d pj-h">${LANG.fr ? "Pourquoi c'est important" : "Why it matters"}</div>
         ${p.problem.map(t => `<p class="cxd">${esc(t)}</p>`).join("")}
       </div>`);
     }
 
     /* solution/approach */
     if (p.solution.length) {
-      out.push(`<div class="pj-s">${sec(num(), "Approach")}
-        <div class="d pj-h">How it works</div>
+      out.push(`<div class="pj-s">${sec(num(), LANG.fr ? "Approche" : "Approach")}
+        <div class="d pj-h">${LANG.fr ? "Comment ça marche" : "How it works"}</div>
         ${p.solution.slice(0, 1).map(t => `<p class="lead" style="max-width:60rem">${esc(t)}</p>`).join("")}
         ${p.solution.length > 1 ? `<div class="pj-g" style="margin-top:1.5rem">
-          ${p.solution.slice(1).map((t, k) => `<div class="cy cyb"><div class="cyi"><span class="lab">Part ${k + 1}</span><p>${esc(t)}</p></div></div>`).join("")}
+          ${p.solution.slice(1).map((t, k) => `<div class="cy cyb"><div class="cyi"><span class="lab">${LANG.fr ? `Partie ${k + 1}` : `Part ${k + 1}`}</span><p>${esc(t)}</p></div></div>`).join("")}
         </div>` : ""}
       </div>`);
     }
 
     /* features — alternating cut-panel rows */
     if (p.features.length) {
-      out.push(`<div class="pj-s">${sec(num(), "Features")}
-        <div class="d pj-h">Under the hood</div>
+      out.push(`<div class="pj-s">${sec(num(), LANG.fr ? "Fonctionnalités" : "Features")}
+        <div class="d pj-h">${LANG.fr ? "Sous le capot" : "Under the hood"}</div>
         ${p.features.map((f, s) => `
         <div class="cxf${s % 2 ? " rv" : ""}">
           <div class="cxx">
@@ -139,8 +141,8 @@ export function mountDetail(
 
     /* journey / highlights — numbered list */
     if (p.journey.length) {
-      out.push(`<div class="pj-s">${sec(num(), "Journey")}
-        <div class="d pj-h">The road so far</div>
+      out.push(`<div class="pj-s">${sec(num(), LANG.fr ? "Parcours" : "Journey")}
+        <div class="d pj-h">${LANG.fr ? "La route jusqu'ici" : "The road so far"}</div>
         <ul class="cxl">
           ${p.journey.map((t, k) => `<li data-k="${k + 1}"><b>${k + 1}</b><span>${esc(t)}</span></li>`).join("")}
         </ul>
@@ -149,7 +151,7 @@ export function mountDetail(
 
     /* metrics / recognition — stat grid */
     if (p.metrics.length) {
-      out.push(`<div class="pj-s">${sec(num(), "Results")}
+      out.push(`<div class="pj-s">${sec(num(), LANG.fr ? "Résultats" : "Results")}
         <div class="cxn">
           ${p.metrics.map(m => `<div><b>${esc(m.value)}</b><span>${esc(m.label)}</span></div>`).join("")}
         </div>
@@ -159,8 +161,8 @@ export function mountDetail(
     /* video demo — embedded in the big panel */
     const vEmbed = embed(p.video);
     if (vEmbed) {
-      out.push(`<div class="pj-s">${sec(num(), "Demo")}
-        <div class="d pj-h">Watch it run</div>
+      out.push(`<div class="pj-s">${sec(num(), LANG.fr ? "Démo" : "Demo")}
+        <div class="d pj-h">${LANG.fr ? "Regardez-le tourner" : "Watch it run"}</div>
         <div class="bp" style="padding:.75rem"><iframe src="${vEmbed}" title="${esc(p.title)} demo"
           style="width:100%;aspect-ratio:16/9;border:0;border-radius:.75rem;display:block"
           allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture"
@@ -170,35 +172,35 @@ export function mountDetail(
 
     /* screenshot wall */
     if (p.screens.length > 1) {
-      out.push(`<div class="pj-s">${sec(num(), "Screenshots")}
-        <div class="d pj-h">In action</div>
+      out.push(`<div class="pj-s">${sec(num(), LANG.fr ? "Captures" : "Screenshots")}
+        <div class="d pj-h">${LANG.fr ? "En action" : "In action"}</div>
         <div class="pj-sh">
-          ${p.screens.map((src, k) => fig(src, "Screen " + (k + 1), p.title + " — screen " + (k + 1))).join("")}
+          ${p.screens.map((src, k) => fig(src, (LANG.fr ? "Écran " : "Screen ") + (k + 1), p.title + " — " + (LANG.fr ? "écran " : "screen ") + (k + 1))).join("")}
         </div>
       </div>`);
     } else if (p.screens.length === 1 && !p.features.length && !p.description.length) {
-      out.push(`<div class="pj-s">${sec(num(), "Screenshots")}
-        <div class="d pj-h">In action</div>${fig(p.screens[0], "Main screen", p.title)}</div>`);
+      out.push(`<div class="pj-s">${sec(num(), LANG.fr ? "Captures" : "Screenshots")}
+        <div class="d pj-h">${LANG.fr ? "En action" : "In action"}</div>${fig(p.screens[0], LANG.fr ? "Écran principal" : "Main screen", p.title)}</div>`);
     }
 
     /* architecture diagram panel (placeholder pipeline visual) */
-    out.push(`<div class="pj-s">${sec(num(), "Architecture")}
-      <div class="d pj-h">How it fits together</div>
+    out.push(`<div class="pj-s">${sec(num(), LANG.fr ? "Architecture" : "Architecture")}
+      <div class="d pj-h">${LANG.fr ? "Comment tout s'articule" : "How it fits together"}</div>
       <div class="bp" style="padding:1rem">
-        <div class="cxtb lab"><span class="on">Design</span><span>Flow</span><span style="margin-left:auto;border:0">${esc(p.stack.slice(0, 2).join(" · "))}</span></div>
+        <div class="cxtb lab"><span class="on">${LANG.fr ? "Conception" : "Design"}</span><span>${LANG.fr ? "Flux" : "Flow"}</span><span style="margin-left:auto;border:0">${esc(p.stack.slice(0, 2).join(" · "))}</span></div>
         <svg class="cxs" style="width:100%;height:auto" viewBox="0 0 1100 420" role="img" aria-label="${esc(p.title)} architecture diagram">${diagram()}</svg>
       </div>
     </div>`);
 
     /* stack */
     if (p.stack.length) {
-      out.push(`<div class="pj-s pj-st" id="pj-stack">${sec(num(), "Stack")}
-        <div class="d pj-h">Built with</div>
-        <div class="cxg"><h4 style="margin-top:0">Tools</h4>
+      out.push(`<div class="pj-s pj-st" id="pj-stack">${sec(num(), LANG.fr ? "Stack" : "Stack")}
+        <div class="d pj-h">${LANG.fr ? "Construit avec" : "Built with"}</div>
+        <div class="cxg"><h4 style="margin-top:0">${LANG.fr ? "Outils" : "Tools"}</h4>
           <div class="cxk">${p.stack.map(t => `<div><span class="mono">${esc(t.slice(0, 2))}</span><b>${esc(t)}</b></div>`).join("")}</div>
         </div>
-        ${p.team ? `<div class="pj-g" style="margin-top:2rem"><div class="cy cyb"><div class="cyi"><span class="lab">Team</span><p>${esc(p.team)}${p.contributors?.length ? " — " + p.contributors.map(esc).join(", ") : ""}</p></div></div>
-        <div class="cy cyb"><div class="cyi"><span class="lab">Recognition</span><p>${esc(p.award || "—")}</p></div></div></div>` : ""}
+        ${p.team ? `<div class="pj-g" style="margin-top:2rem"><div class="cy cyb"><div class="cyi"><span class="lab">${LANG.fr ? "Équipe" : "Team"}</span><p>${esc(p.team)}${p.contributors?.length ? " — " + p.contributors.map(esc).join(", ") : ""}</p></div></div>
+        <div class="cy cyb"><div class="cyi"><span class="lab">${LANG.fr ? "Reconnaissance" : "Recognition"}</span><p>${esc(p.award || "—")}</p></div></div></div>` : ""}
       </div>`);
     }
 
@@ -208,11 +210,12 @@ export function mountDetail(
 
   /* ---------- detail HTML ---------- */
   function render(i: number): string {
+    const LANG = { fr: getLang() === "fr" };
     const p = projects[i];
     const c = (i + 1) % N, prev = (i + N - 1) % N;
     const heroMedia = p.cover
       ? `<img src="${p.cover}" alt="${esc(p.title)} hero screenshot" loading="lazy" decoding="async">`
-      : `<span class="pj-ph lab">screenshots coming soon</span>`;
+      : `<span class="pj-ph lab">${LANG.fr ? "captures à venir" : "screenshots coming soon"}</span>`;
     return `
       <div class="pj-w">
         <span class="pj-no" aria-hidden="true">${pad(i)}</span>
@@ -220,15 +223,15 @@ export function mountDetail(
         <h1 class="d pj-t"><span class="w"><span>${esc(p.title)}</span></span></h1>
         <p class="lead l0 fade">${esc(p.summary)}</p>
         <div class="pj-m fade">
-          <div><div class="lab">Category</div><span class="d">${esc(p.category)}</span></div>
-          <div><div class="lab">Period</div><span class="d">${esc(p.period || "—")}</span></div>
-          <div><div class="lab">Team</div><span class="d">${esc(p.team || "Solo")}</span></div>
-          <div><div class="lab">Stack</div><span class="d">${p.stack.length} technologies</span></div>
+          <div><div class="lab">${LANG.fr ? "Catégorie" : "Category"}</div><span class="d">${esc(p.category)}</span></div>
+          <div><div class="lab">${LANG.fr ? "Période" : "Period"}</div><span class="d">${esc(p.period || "—")}</span></div>
+          <div><div class="lab">${LANG.fr ? "Équipe" : "Team"}</div><span class="d">${esc(p.team || (LANG.fr ? "Solo" : "Solo"))}</span></div>
+          <div><div class="lab">${LANG.fr ? "Stack" : "Stack"}</div><span class="d">${p.stack.length} ${LANG.fr ? "technologies" : "technologies"}</span></div>
         </div>
         <div class="pj-bt fade">
-          ${p.github ? `<a class="cyb2" href="${p.github}" target="_blank" rel="noopener">View on GitHub ↗</a>` : ""}
-          ${p.live ? `<a class="cyb2 lm" href="${p.live}" target="_blank" rel="noopener">Open project ↗</a>` : ""}
-          <a class="cyb2 lm" href="#" data-back>← All projects</a>
+          ${p.github ? `<a class="cyb2" href="${p.github}" target="_blank" rel="noopener">${LANG.fr ? "Voir sur GitHub" : "View on GitHub"} ↗</a>` : ""}
+          ${p.live ? `<a class="cyb2 lm" href="${p.live}" target="_blank" rel="noopener">${LANG.fr ? "Ouvrir le projet" : "Open project"} ↗</a>` : ""}
+          <a class="cyb2 lm" href="#" data-back>← ${LANG.fr ? "Tous les projets" : "All projects"}</a>
         </div>
         <div class="cy cyb pj-hero fade"><div class="cyi">
           ${heroMedia}
@@ -242,11 +245,11 @@ export function mountDetail(
         </div></div>
       </div>
       ${body(p, i)}
-      <a class="cy pj-nx2" href="#p-${projects[c].slug}"><span class="cyi"><span class="lab">Next</span>
+      <a class="cy pj-nx2" href="#p-${projects[c].slug}"><span class="cyi"><span class="lab">${LANG.fr ? "Suivant" : "Next"}</span>
         <span class="d">${esc(projects[c].title)} →</span></span></a>
       <div class="pj-ft lab"><a href="#p-${projects[prev].slug}">← ${esc(projects[prev].title)}</a>
         ${p.github ? `<a href="${p.github}" target="_blank" rel="noopener">GitHub ↗</a>` : ""}
-        ${p.pdf ? `<a href="${p.pdf}" target="_blank" rel="noopener">Presentation PDF ↗</a>` : ""}</div>`;
+        ${p.pdf ? `<a href="${p.pdf}" target="_blank" rel="noopener">${LANG.fr ? "PDF de présentation" : "Presentation PDF"} ↗</a>` : ""}</div>`;
   }
 
   /* ---------- open / close (exact choreography) ---------- */

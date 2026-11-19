@@ -646,7 +646,7 @@ function splitText(el, mode) {
 /* ----------------------------------------------------------------- */
 /* 4. MOUNT / BOOT                                                    */
 /* ----------------------------------------------------------------- */
-export function mountLWH(root, { onExitUniverse = () => {} } = {}) {
+export function mountLWH(root, { onExitUniverse = () => {}, resumeY = null } = {}) {
   const disposes = [];
   const createdTriggers = [];
 
@@ -1049,6 +1049,27 @@ export function mountLWH(root, { onExitUniverse = () => {} } = {}) {
     document.body.classList.add("is-ready");
     if (dom.preloader) dom.preloader.style.display = "none";
     startJourney();
+  } else if (resumeY !== null) {
+    /* RESUME path (language switch): skip the preloader entirely, mark the
+       film ready and jump straight back to the saved scroll position so the
+       switch feels like an in-place translation, not a restart. */
+    document.body.classList.remove("is-loading");
+    document.body.classList.add("is-ready");
+    if (dom.preloader) dom.preloader.style.display = "none";
+    startJourney();
+    requestAnimationFrame(() => {
+      try {
+        if (window.__lwh && typeof window.__lwh.scrollTo === "function") {
+          window.__lwh.scrollTo(resumeY, { immediate: true, force: true });
+        } else {
+          window.scrollTo(0, resumeY);
+        }
+        ScrollTrigger.refresh();
+      } catch {
+        window.scrollTo(0, resumeY);
+      }
+      if (resumeY > 40) document.body.classList.add("scrolled");
+    });
   } else {
     runPreloader(() => {
       startJourney();

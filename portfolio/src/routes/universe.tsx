@@ -8,7 +8,9 @@ import { UniverseSection } from "@/components/portfolio/sections/UniverseSection
 import { AboutSection } from "@/components/portfolio/sections/AboutSection";
 import { ContactSection } from "@/components/portfolio/sections/ContactSection";
 import { ProjectsScene } from "@/components/projects/ProjectsScene";
-import type { Project } from "@/data/portfolio";
+import { LangSwitch } from "@/components/ui/LangSwitch";
+import { localizeProject, type Project } from "@/data/portfolio";
+import { useLang } from "@/lib/lang";
 
 export const Route = createFileRoute("/universe")({
   head: () => ({
@@ -34,6 +36,10 @@ function Universe() {
   /* land directly on the About section (arriving from the intro film) */
   const [active, setActive] = useState<SectionKey>("about");
   const [project, setProject] = useState<Project | null>(null);
+  const lang = useLang();
+
+  /* open the case-file in the active language (names + stack untouched) */
+  const openProject = (p: Project) => setProject(localizeProject(p, lang === "fr"));
 
   /* deep links like /universe#p-overdose open straight onto the projects scene */
   useEffect(() => {
@@ -56,10 +62,11 @@ function Universe() {
       </div>
 
       <Navbar active={active} onChange={handleChange} />
+      <LangSwitch />
 
       {/* Work — the deck scene owns its own scroll space, so it renders outside
           the motion.section (transform animations would break its fixed overlay) */}
-      {active === "works" && <ProjectsScene onOpenProject={setProject} />}
+      {active === "works" && <ProjectsScene onOpenProject={openProject} />}
 
       {active !== "works" && (
         <main className="relative z-10 pt-16">
@@ -74,7 +81,7 @@ function Universe() {
               {active === "universe" && (
                 <UniverseSection
                   onNavigate={handleChange}
-                  onOpenProject={setProject}
+                  onOpenProject={openProject}
                 />
               )}
               {active === "about" && <AboutSection />}

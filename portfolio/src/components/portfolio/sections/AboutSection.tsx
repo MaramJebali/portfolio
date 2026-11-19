@@ -110,6 +110,7 @@ import hederaHbf from "@/assets/certificates/hedera-hbf.pdf";
 import hederaHcf from "@/assets/certificates/hedera-hcf.pdf";
 import hederaHcda from "@/assets/certificates/hedera-hcda.pdf";
 import { HeroManifesto, FlippingImagePill } from "@/components/ui/HeroManifesto";
+import { useLang } from "@/lib/lang";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -245,10 +246,12 @@ const skillIcons: Record<string, { Icon: IconType; color: string }> = {
 const skillCategories = [
   {
     title: "Languages",
+    titleFr: "Langages",
     items: ["Python", "JavaScript", "TypeScript", "SQL", "C", "C++", "Java"],
   },
   {
     title: "Data",
+    titleFr: "Données",
     items: [
       "PostgreSQL",
       "MongoDB",
@@ -263,6 +266,7 @@ const skillCategories = [
   },
   {
     title: "ML & Deep Learning",
+    titleFr: "ML & Deep Learning",
     items: [
       "PyTorch",
       "TensorFlow",
@@ -278,6 +282,7 @@ const skillCategories = [
   },
   {
     title: "Agentic & Gen AI",
+    titleFr: "IA agentique & générative",
     items: [
       "LangGraph",
       "LangChain",
@@ -294,18 +299,22 @@ const skillCategories = [
   },
   {
     title: "Cloud, DevOps & MLOps",
+    titleFr: "Cloud, DevOps & MLOps",
     items: ["AWS", "Docker", "MLOps", "DevOps", "Vercel", "Render"],
   },
   {
     title: "GitOps & CI/CD",
+    titleFr: "GitOps & CI/CD",
     items: ["GitHub Actions", "GitLab CI", "Jenkins"],
   },
   {
     title: "Backend",
+    titleFr: "Backend",
     items: ["FastAPI", "Django", "Celery", "REST APIs", "Git"],
   },
   {
     title: "Frontend & design",
+    titleFr: "Frontend & design",
     items: [
       "HTML",
       "CSS",
@@ -320,6 +329,7 @@ const skillCategories = [
   },
   {
     title: "Design & Montage",
+    titleFr: "Design & Montage",
     items: [
       "Photoshop",
       "Illustrator",
@@ -352,22 +362,29 @@ function SectionHeading({
   lead,
   accent,
   sub,
+  leadFr,
+  accentFr,
+  subFr,
 }: {
   lead: string;
   accent: string;
   sub?: string;
+  leadFr?: string;
+  accentFr?: string;
+  subFr?: string;
 }) {
+  const fr = useLang() === "fr";
   return (
     <div data-reveal>
       <h3 className="font-display text-3xl text-white sm:text-4xl">
-        {lead}{" "}
+        {(fr && leadFr) || lead}{" "}
         <span className="italic" style={{ color: ACCENT_TEXT }}>
-          {accent}
+          {(fr && accentFr) || accent}
         </span>
       </h3>
       {sub && (
         <p className="mt-4 max-w-2xl font-sans text-[0.95rem] leading-[1.7] text-white/65">
-          {sub}
+          {(fr && subFr) || sub}
         </p>
       )}
     </div>
@@ -406,10 +423,11 @@ function SkillFolder({
   category,
   index,
 }: {
-  category: { title: string; items: string[] };
+  category: { title: string; titleFr?: string; items: string[] };
   index: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const fr = useLang() === "fr";
 
   const bg =
     index === 2 ? SK_BG_STRONG : index % 2 === 0 ? SK_BG_SOFT : SK_BG_PLAIN;
@@ -435,7 +453,8 @@ function SkillFolder({
     <div className="sk-folder" ref={ref} style={{ ["--sk-bg" as string]: bg }} onPointerMove={onMove} onPointerLeave={onLeave} data-sk-folder>
       <div className="sk-tab">
         <span>
-          {String(index + 1).padStart(2, "0")} {category.title.toUpperCase()}
+          {String(index + 1).padStart(2, "0")}{" "}
+          {((fr && category.titleFr) || category.title).toUpperCase()}
         </span>
       </div>
       <span className="sk-plus" aria-hidden>+</span>
@@ -764,7 +783,10 @@ function ExperienceItem({
   onToggle: () => void;
   panelId: string;
 }) {
-  const period = exp.period.replace(" · 2 mos", "");
+  const fr = useLang() === "fr";
+  const period = exp.period
+    .replace(" · 2 mos", "")
+    .replace("Present", "aujourd'hui");
   const location = exp.location
     ?.replace(" · Hybrid", "")
     .replace(" · On-site", "");
@@ -808,7 +830,7 @@ function ExperienceItem({
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
                 <p className="font-sans text-base font-semibold tracking-tight text-white md:text-[1.075rem]">
-                  {exp.role}
+                  {(fr && exp.roleFr) || exp.role}
                 </p>
                 {exp.current && (
                   <span
@@ -818,7 +840,7 @@ function ExperienceItem({
                       color: "rgba(219,234,254,0.95)",
                     }}
                   >
-                    Current
+                    {fr ? "En poste" : "Current"}
                   </span>
                 )}
               </div>
@@ -873,12 +895,12 @@ function ExperienceItem({
               >
                 <div>
                   <p className="max-w-[65ch] font-sans text-[0.95rem] leading-[1.75] text-white/80">
-                    {exp.desc}
+                    {(fr && exp.descFr) || exp.desc}
                   </p>
 
                   {exp.bullets && exp.bullets.length > 0 && (
                     <ul className="mt-5 max-w-[65ch] space-y-2.5">
-                      {exp.bullets.map((b, idx) => (
+                      {((fr && exp.bulletsFr) || exp.bullets)!.map((b, idx) => (
                         <li
                           key={idx}
                           className="flex gap-3 font-sans text-[0.9rem] leading-[1.7] text-white/72"
@@ -1234,6 +1256,69 @@ function AboutManifesto() {
   const pill =
     "h-9 w-14 sm:h-10 sm:w-16 md:h-12 md:w-[4.5rem] align-[-0.35em]";
 
+  if (useLang() === "fr") {
+    let n = 0;
+    const fw = (t: string) => <MWord key={n++}>{t}</MWord>;
+    return (
+      <div
+        ref={containerRef}
+        className="font-display text-[clamp(1.35rem,2.2vw,2rem)] leading-[1.45] text-white/88"
+      >
+        {fw("Salut !")}
+        {fw("Je")}
+        {fw("crois")}
+        {fw("que")}
+        {fw("c'est")}
+        {fw("dans")}
+        {fw("les")}
+        <FlippingImagePill images={ABOUT_PILL_IMAGES.handsOn} index={1} className={pill} />
+        {fw("projets")}
+        {fw("concrets")}
+        {fw("et")}
+        {fw("l'exploration")}
+        {fw("d'approches")}
+        {fw("innovantes")}
+        {fw("de")}
+        {fw("la")}
+        {fw("durabilité")}
+        {fw("que")}
+        {fw("je")}
+        {fw("donne")}
+        {fw("le")}
+        {fw("meilleur")}
+        {fw("de")}
+        {fw("moi-même.")}
+        <br className="hidden md:block" />
+        {fw("J'ai")}
+        {fw("à")}
+        {fw("cœur")}
+        {fw("d'apporter")}
+        {fw("ma")}
+        {fw("créativité,")}
+        {fw("mes")}
+        {fw("compétences")}
+        {fw("techniques")}
+        {fw("et")}
+        {fw("mon")}
+        {fw("enthousiasme")}
+        {fw("à")}
+        <FlippingImagePill images={ABOUT_PILL_IMAGES.team} index={3} className={pill} />
+        {fw("des")}
+        {fw("projets")}
+        {fw("collaboratifs,")}
+        {fw("tout")}
+        {fw("en")}
+        {fw("me")}
+        {fw("dépassant")}
+        {fw("au-delà")}
+        {fw("de")}
+        {fw("mes")}
+        {fw("limites")}
+        {fw("actuelles.")}
+      </div>
+    );
+  }
+
   return (
     <div
       ref={containerRef}
@@ -1326,6 +1411,7 @@ function InlineCVMenu() {
 
   const triggerBase =
     "inline-flex min-h-[44px] cursor-pointer items-center gap-2.5 rounded-full border px-6 py-2.5 font-mono text-[0.8rem] font-semibold uppercase tracking-[0.14em] transition-all duration-300";
+  const fr = useLang() === "fr";
 
   const pastel = {
     backgroundImage:
@@ -1366,10 +1452,10 @@ function InlineCVMenu() {
             />
           </svg>
           {status === "downloading"
-            ? "Downloading…"
+            ? fr ? "Téléchargement…" : "Downloading…"
             : status === "done"
-              ? "Downloaded"
-              : "Download CV"}
+              ? fr ? "Téléchargé" : "Downloaded"
+              : fr ? "Télécharger le CV" : "Download CV"}
           <ChevronDown
             aria-hidden
             className={`h-4 w-4 transition-transform duration-300 ${
@@ -1390,7 +1476,7 @@ function InlineCVMenu() {
             }}
           >
             <p className="border-b border-[#0a0d1c]/10 px-4 py-2.5 font-mono text-[0.62rem] uppercase tracking-[0.2em] text-[#0a0d1c]/60">
-              Choose your CV language
+              {fr ? "Choisissez la langue du CV" : "Choose your CV language"}
             </p>
             {CV_LANGUAGES.map((opt) => (
               <a
@@ -1566,6 +1652,8 @@ export function AboutSection({
   }, []);
 
   const NameHeading = SHOW_HERO ? "h2" : "h1";
+  const lang = useLang();
+  const fr = lang === "fr";
 
   return (
     <div ref={sectionRef} className="relative">
@@ -1597,9 +1685,9 @@ export function AboutSection({
               data-cascade
               className="font-display text-4xl text-white sm:text-5xl select-none"
             >
-              About{" "}
+              {fr ? "À propos" : "About"}{" "}
               <span className="italic" style={{ color: ACCENT_TEXT }}>
-                me
+                {fr ? "de moi" : "me"}
               </span>
             </NameHeading>
 
@@ -1621,7 +1709,7 @@ export function AboutSection({
                   className="h-4 w-4 shrink-0"
                   style={{ color: SOFT_LAVENDER }}
                 />
-                {profile.role}
+                {fr ? profile.roleFr : profile.role}
               </li>
               <li className="flex items-center gap-3">
                 <GraduationCap
@@ -1651,6 +1739,9 @@ export function AboutSection({
             lead="Work"
             accent="experience"
             sub="Select a role to see what I did and the tools I used."
+            leadFr="Expérience"
+            accentFr="professionnelle"
+            subFr="Sélectionnez un rôle pour voir ce que j'ai fait et les outils utilisés."
           />
           <div className="mt-12">
             <ExperienceList />
@@ -1663,6 +1754,9 @@ export function AboutSection({
             lead="Skills"
             accent="& tools"
             sub="What I use day to day, grouped by area."
+            leadFr="Compétences"
+            accentFr="& outils"
+            subFr="Ce que j'utilise au quotidien, regroupé par domaine."
           />
           <div
             ref={skillsRef}
@@ -1688,17 +1782,20 @@ export function AboutSection({
             lead="Certifications"
             accent="& credentials"
             sub="NVIDIA and Hashgraph-issued certificates. Select one to view the full credential."
+            leadFr="Certifications"
+            accentFr="& diplômes"
+            subFr="Certificats délivrés par NVIDIA et Hashgraph. Sélectionnez-en un pour voir le credential complet."
           />
           <div className="relative mt-10 space-y-10">
             <CertificationRow
               items={certifications}
-              label="AI & Deep Learning"
+              label={fr ? "IA & Deep Learning" : "AI & Deep Learning"}
               duration={55}
               onSelect={setSelectedCertIndex}
             />
             <CertificationRow
               items={hederaCertifications}
-              label="Blockchain & Hedera"
+              label={fr ? "Blockchain & Hedera" : "Blockchain & Hedera"}
               duration={65}
               onSelect={(i) => setSelectedCertIndex(certifications.length + i)}
             />

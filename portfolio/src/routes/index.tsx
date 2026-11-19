@@ -1,5 +1,59 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef } from "react";
+import { LangSwitch } from "@/components/ui/LangSwitch";
+import { useLang, type Lang } from "@/lib/lang";
+
+/* Film copy — EN / FR side by side so the language switch can swap live. */
+const FILM_COPY = {
+  en: {
+    beats: [
+      {
+        h: "Before every discovery, there is a little wonder.",
+        p: "A question. A possibility. A mind that refuses to stop wondering what lies beyond what we already know.",
+      },
+      {
+        h: "I followed curiosity into the unknown.",
+        p: "Through the worlds of Artificial Intelligence and Data Science, I discovered endless ways to explore ideas, challenge assumptions, and turn complex questions into possibilities.",
+      },
+      {
+        h: "And slowly, scattered ideas became constellations.",
+        p: "Algorithms became experiments. Experiments became projects. Somewhere between imagination and engineering, I began crafting intelligent systems — one idea at a time.",
+      },
+      {
+        h: "But the universe was never meant to end here.",
+        p: "There are still worlds to discover, boundaries to challenge, and intelligent solutions to build. Especially where technology meets the possibility of a more sustainable future.",
+      },
+    ],
+    drift: ["From a curious thought to something real.", "Every project adds another star."],
+    hint: "THE STORY IS ONLY BEGINNING.",
+    cue: "scroll down to meet the mind behind the universe\u00A0\u00A0↓",
+    preloader: "BEFORE EVERY DISCOVERY...",
+  },
+  fr: {
+    beats: [
+      {
+        h: "Avant chaque découverte, il y a un peu d'émerveillement.",
+        p: "Une question. Une possibilité. Un esprit qui refuse d'arrêter de se demander ce qui se trouve au-delà de ce que nous savons déjà.",
+      },
+      {
+        h: "J'ai suivi ma curiosité vers l'inconnu.",
+        p: "À travers les mondes de l'intelligence artificielle et de la science des données, j'ai découvert d'innombrables façons d'explorer des idées, de remettre en question les certitudes et de transformer des questions complexes en possibilités.",
+      },
+      {
+        h: "Et lentement, des idées éparses sont devenues des constellations.",
+        p: "Les algorithmes sont devenus des expériences. Les expériences sont devenues des projets. Quelque part entre l'imagination et l'ingénierie, j'ai commencé à créer des systèmes intelligents — une idée à la fois.",
+      },
+      {
+        h: "Mais l'univers n'était pas fait pour s'arrêter ici.",
+        p: "Il reste des mondes à explorer, des limites à repousser et des solutions intelligentes à construire. Là où la technologie rencontre la promesse d'un avenir plus durable.",
+      },
+    ],
+    drift: ["D'une pensée curieuse à quelque chose de réel.", "Chaque projet ajoute une étoile."],
+    hint: "L'HISTOIRE NE FAIT QUE COMMENCER.",
+    cue: "faites défiler pour rencontrer l'esprit derrière l'univers\u00A0\u00A0↓",
+    preloader: "AVANT CHAQUE DÉCOUVERTE...",
+  },
+} as const;
 
 /* ==========================================================================
    THE LONG WAY HOME — the full interactive film, ported into the portfolio.
@@ -33,25 +87,37 @@ export const Route = createFileRoute("/")({
    parked bottom-right (clear of the full-height scroll rail on the right),
    always reachable above the preloader, rests quiet and wakes on hover. */
 function SkipPill({ onSkip }: { onSkip: () => void }) {
+  /* Film-engine click feedback — the custom cursor's ring blooms warm while
+     the button is held (body.cursor-held). */
+  const flashCursor = () => {
+    try {
+      document.body.classList.add("cursor-held");
+      window.setTimeout(() => document.body.classList.remove("cursor-held"), 350);
+    } catch {
+      /* noop */
+    }
+  };
+
   return (
     <div
-      className="pointer-events-none fixed bottom-0 z-[120] flex justify-end pb-5 pr-5 sm:pb-6 sm:pr-7"
-      style={{ right: "clamp(2.6rem, 4.5vw, 3.4rem)" }}
+      className="pointer-events-none fixed bottom-0 z-[120] flex justify-end pr-5 sm:pr-7"
+      style={{ bottom: "clamp(2.75rem, 6vh, 4rem)", right: "clamp(2.6rem, 4.5vw, 3.4rem)" }}
     >
       <button
         type="button"
+        onPointerDown={flashCursor}
         onClick={onSkip}
         aria-label="Skip the film and enter the universe"
-        className="skip-pill group pointer-events-auto flex cursor-pointer items-center gap-2 rounded-full border border-primary/50 bg-primary/15 px-8 py-3.5 font-mono text-xs uppercase tracking-[0.2em] text-foreground shadow-[var(--shadow-glow)] transition-colors hover:bg-primary/25"
+        className="skip-pill pointer-events-auto flex cursor-pointer items-center gap-2.5 font-mono text-sm uppercase tracking-[0.24em] text-foreground transition-colors duration-300 hover:text-[color:var(--rail-color,#FFB36B)]"
       >
-        <span className="text-xs uppercase tracking-[0.2em]">Skip</span>
+        <span className="text-sm uppercase tracking-[0.24em]">Skip</span>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
           strokeWidth={2}
           stroke="currentColor"
-          className="h-4 w-4"
+          className="h-[1.15rem] w-[1.15rem]"
           aria-hidden
         >
           <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12l-7.5 7.5M21 12H3" />
@@ -62,8 +128,22 @@ function SkipPill({ onSkip }: { onSkip: () => void }) {
 }
 
 function Index() {
+  /* The film is keyed by language: switching EN/FR cleanly disposes the
+     engine (WebGL, triggers, split-text DOM) and remounts it with the new
+     copy — a soft in-app remount, NOT a page reload. */
+  const lang = useLang();
+  return <FilmRoot key={lang} lang={lang} />;
+}
+
+/* Scroll handoff between language remounts: the unmounting film saves its
+   scroll position; the fresh mount picks it up if the swap was immediate. */
+let lwhResumeY: number | null = null;
+let lwhResumeTs = 0;
+
+function FilmRoot({ lang }: { lang: Lang }) {
   const navigate = useNavigate();
   const rootRef = useRef<HTMLDivElement>(null);
+  const copy = FILM_COPY[lang];
 
   /* Inject the story stylesheet for this route only; mount the film; tear
      everything down (WebGL loop, triggers, listeners, Lenis hooks) on exit. */
@@ -73,12 +153,19 @@ function Index() {
     link.href = "/long-way-home/style.css?v=7";
     document.head.appendChild(link);
 
+    /* Language switch remount: resume at the exact scroll position, skipping
+       the preloader, so the film translates in place. */
+    const resumeY =
+      lwhResumeY !== null && Date.now() - lwhResumeTs < 1500 ? lwhResumeY : null;
+    lwhResumeY = null;
+
     let dispose: (() => void) | undefined;
     let cancelled = false;
 
     import("@/longwayhome/lwh-main").then((m) => {
       if (cancelled || !rootRef.current) return;
       dispose = m.mountLWH(rootRef.current, {
+        resumeY,
         onExitUniverse: () => {
           /* Tell the universe page the film handed over here — it should
              open straight onto the About section. */
@@ -94,6 +181,14 @@ function Index() {
 
     return () => {
       cancelled = true;
+      /* Save the position so an immediate remount (language switch) resumes
+         instead of replaying the preloader. */
+      try {
+        lwhResumeY = window.scrollY;
+        lwhResumeTs = Date.now();
+      } catch {
+        /* noop */
+      }
       dispose?.();
       link.remove();
     };
@@ -113,11 +208,14 @@ function Index() {
         navigate({ to: "/universe" });
       }} />
 
+      {/* =========== LANGUAGE SWITCH — top-left, opposite the navbar =========== */}
+      <LangSwitch extraInset />
+
       {/* =========== PRELOADER =========== */}
       <div className="preloader" id="preloader" aria-hidden="true">
         <div className="preloader__inner">
           <div className="preloader__label" data-pl-label>
-            BEFORE EVERY DISCOVERY...
+            {copy.preloader}
           </div>
           <div className="preloader__count">
             <span className="preloader__num" id="plNum">
@@ -164,11 +262,10 @@ function Index() {
         >
           <div className="beat__inner">
             <h1 className="headline headline--hero" data-split="chars">
-              Before every discovery, there is a little wonder.
+              {copy.beats[0].h}
             </h1>
             <p className="sub" data-reveal="up">
-              A question. A possibility. A mind that refuses to stop wondering
-              what lies beyond what we already know.
+              {copy.beats[0].p}
             </p>
           </div>
         </section>
@@ -182,12 +279,10 @@ function Index() {
         >
           <div className="beat__inner">
             <h2 className="headline" data-split="words">
-              I followed curiosity into the unknown.
+              {copy.beats[1].h}
             </h2>
             <p className="sub" data-reveal="up">
-              Through the worlds of Artificial Intelligence and Data Science, I
-              discovered endless ways to explore ideas, challenge assumptions,
-              and turn complex questions into possibilities.
+              {copy.beats[1].p}
             </p>
           </div>
         </section>
@@ -201,20 +296,18 @@ function Index() {
         >
           <div className="beat__inner">
             <h2 className="headline" data-split="words">
-              And slowly, scattered ideas became constellations.
+              {copy.beats[2].h}
             </h2>
             <p className="sub" data-reveal="up">
-              Algorithms became experiments. Experiments became projects.
-              Somewhere between imagination and engineering, I began crafting
-              intelligent systems — one idea at a time.
+              {copy.beats[2].p}
             </p>
           </div>
           {/* EXPERIMENT (narrative v2): standalone drifting line, positioned
               midway (in scroll distance) between movement III and IV. */}
           <p className="drift drift--between" data-reveal="fade">
-            From a curious thought to something real.
+            {copy.drift[0]}
             <br />
-            Every project adds another star.
+            {copy.drift[1]}
           </p>
         </section>
 
@@ -227,18 +320,16 @@ function Index() {
         >
           <div className="beat__inner">
             <h2 className="headline headline--bloom" data-split="words">
-              But the universe was never meant to end here.
+              {copy.beats[3].h}
             </h2>
             <p className="sub sub--italic" data-reveal="up">
-              There are still worlds to discover, boundaries to challenge, and
-              intelligent solutions to build. Especially where technology meets
-              the possibility of a more sustainable future.
+              {copy.beats[3].p}
             </p>
             <p className="finale__hint" data-reveal="up">
-              THE STORY IS ONLY BEGINNING.
+              {copy.hint}
             </p>
             <p className="dive-cue" data-reveal="up">
-              scroll down to meet the mind behind the universe&nbsp;&nbsp;↓
+              {copy.cue}
             </p>
           </div>
         </section>

@@ -62,7 +62,7 @@
   --radius: 0.875rem;
 
   /* Cosmic editorial dark theme */
-  --background: oklch(0.11 0.025 285);
+  --background: oklch(0.11 0.025 285 / 0.9);
   --foreground: oklch(0.97 0.008 285);
   --card: oklch(0.15 0.028 287);
   --card-foreground: oklch(0.97 0.008 285);
@@ -113,6 +113,10 @@
 }
 
 @layer base {
+  html {
+    background-color: oklch(0.11 0.025 285);
+  }
+
   * {
     border-color: var(--color-border);
   }
@@ -146,6 +150,54 @@
   .scrollbar-thin::-webkit-scrollbar-thumb {
     background-color: oklch(0.4 0.06 292 / 0.5);
     border-radius: 9999px;
+  }
+}
+
+/* ==========================================================================
+   LANG SWITCH (EN | FR) — shared by / and /universe. The film's stylesheet
+   resets button fonts (`font: inherit`) and the engine rescales the root
+   font-size, so the size + family are pinned here to look identical on both
+   pages, at any viewport.
+   ========================================================================== */
+.lang-switch button {
+  font-family: var(--font-mono), ui-monospace, monospace !important;
+  font-size: 13px !important;
+  letter-spacing: 0.24em !important;
+  text-transform: uppercase;
+}
+
+/* ==========================================================================
+   SKIP (intro film) — bare text button, bottom-right, raised above the rail.
+   The pulse lives on the TEXT: a breathing violet glow. Idle color is dimmed;
+   hover/focus lights it up. Disabled for reduced motion.
+   ========================================================================== */
+@keyframes skip-pulse {
+  0%,
+  100% {
+    opacity: 0.6;
+    text-shadow: 0 0 8px color-mix(in srgb, var(--rail-color, #a78bfa) 25%, transparent);
+  }
+  50% {
+    opacity: 1;
+    text-shadow:
+      0 0 14px color-mix(in srgb, var(--rail-color, #a78bfa) 75%, transparent),
+      0 0 34px color-mix(in srgb, var(--rail-color, #a78bfa) 40%, transparent);
+  }
+}
+.skip-pill {
+  animation: skip-pulse 2.4s ease-in-out infinite;
+}
+.skip-pill:hover,
+.skip-pill:focus-visible {
+  animation-play-state: paused;
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .skip-pill,
+  .skip-pill:hover,
+  .skip-pill:focus-visible {
+    animation: none;
+    opacity: 1;
   }
 }
 
